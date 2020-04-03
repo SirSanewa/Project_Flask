@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="shortcut icon" href="/static/icon.png">
+    <style>
+        body {
+        background-image: url("/static/background.jpg");
+        height: 100%;
+        }
+        table {
+        table-layout: auto;
+        width: 100%;
+        }
+    </style>
+</head>
+<body>
+    {% extends "menu.html" %}
+    {% block page_content %}
+    <table border="1 px solid black" width="100%">
+        <tr>
+            <td colspan="3" height="80px">
+                {{ name }}, klasa, exp i kasa
+            </td>
+        </tr>
+        <tr>
+            <td height="450px" width="25%">
+                Statystyki:
+                <ul type="square">
+                    <li>
+                        HP:
+                    </li>
+                    <li>
+                        Mana:
+                    </li>
+                    <li>
+                        Stamina:
+                    </li>
+                    <li>
+                        Armor:
+                    </li>
+                    <li>
+                        Attack damage:
+                    </li>
+                    <li>
+                        Steal chance:
+                    </li>
+                    <li>
+                        Critic damage chance:
+                    </li>
+                    <li>
+                        Capacity:
+                    </li>
+                </ul>
+            </td>
+            <td width="30%">
+                Ekwipunek
+            </td >
+            <td width="45%">
+                Plecak
+            </td>
+        </tr>
+    </table>
+    {% endblock %}
+</body>
+</html>
