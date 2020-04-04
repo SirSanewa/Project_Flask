@@ -9,6 +9,7 @@ class Hero:
 
     def create_profile_in_database(self):
         sql_connection = sqlite3.connect("database.db")
+        sql_connection.execute("PRAGMA foreign_keys = ON;")
         cursor = sql_connection.cursor()
         file_path = path.realpath("queries/profile_create_table.sql")
         with open(file_path, encoding="utf-8") as file:

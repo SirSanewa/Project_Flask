@@ -1,4 +1,5 @@
 import sqlite3
+from os import path
 
 
 def create_database_sqlite():
@@ -8,24 +9,9 @@ def create_database_sqlite():
     """
     sql_connection = sqlite3.connect("database.db")
     cursor = sql_connection.cursor()
-    query = """
-    CREATE TABLE IF NOT EXISTS "inventory" (
-        "name"      TEXT UNIQUE,
-        "type"      TEXT,
-        "modifier"  TEXT
-    );
-    INSERT OR IGNORE INTO "inventory" ("name", "type", "modifier")
-    VALUES  ("Helmet", NULL, NULL),
-            ("Armor", NULL, NULL),
-            ("Gloves", NULL, NULL),
-            ("Boots", NULL, NULL),
-            ("Weapon", NULL, NULL);
-    CREATE TABLE IF NOT EXISTS "backpack" (
-        "name"      TEXT,
-        "type"      TEXT,
-        "amount"    INTEGER
-    );
-    """
+    file_path = path.realpath("queries/backpack_create_database.sql")
+    with open(file_path, encoding="utf-8") as file:
+        query = file.read()
     cursor.executescript(query)
     sql_connection.commit()
     sql_connection.close()
@@ -36,13 +22,11 @@ def insert_data_to_database(item_name, item_type, modifier_amount):
     Takes in item_name, item_type, modifier_amount values and creates item in 'backpack' list in database file.
     Initiates create_database_sqlite() to check if database exists or to create it if not.
     """
-    create_database_sqlite()
     sql_connection = sqlite3.connect("database.db")
     cursor = sql_connection.cursor()
-    query = """
-    INSERT INTO "backpack" ("name", "type", "amount")
-    VALUES (:name, :type, :amount);
-    """
+    file_path = path.realpath("queries/backpack_insert_data.sql")
+    with open(file_path, encoding="utf-8") as file:
+        query = file.read()
     dictionary = {"name": item_name, "type": item_type, "amount": modifier_amount}
     cursor.execute(query, dictionary)
     sql_connection.commit()
@@ -55,7 +39,6 @@ def return_rows_from_database(table_name, readable_names=False):
     function will return class items which allows itering over them, if readable_name=True return human readable
     tuple lists. Initiates create_database_sqlite() to check if database exists or to create it if not.
     """
-    create_database_sqlite()
     sql_connection = sqlite3.connect("database.db")
     if not readable_names:
         sql_connection.row_factory = sqlite3.Row
@@ -76,7 +59,6 @@ def return_amount_from_database_item(item_name):
     Takes in item_name and returns an int value of its amount attribute. Initiates create_database_sqlite() to check
     if database exists or to create it if doesn't.
     """
-    create_database_sqlite()
     sql_connection = sqlite3.connect("database.db")
     cursor = sql_connection.cursor()
     query = """
@@ -97,7 +79,6 @@ def update_database(table_name, item_name, item_type, modifier_amount):
     from database, modifies item_name's attributes (type and amount) with item_type and modifier_amount.
     Initiates create_database_sqlite() to check if database exists or to create it if not.
     """
-    create_database_sqlite()
     if table_name == "inventory":
         key = "modifier"
     else:
@@ -121,7 +102,6 @@ def remove_from_database(item_name):
     Takes in item_name and removes its entire row from database.db. Initiates create_database_sqlite() to check if
     database exists or to create it if not.
     """
-    create_database_sqlite()
     sql_connection = sqlite3.connect("database.db")
     cursor = sql_connection.cursor()
     query = """
@@ -141,6 +121,7 @@ class Inventory:
     def __init__(self, capacity=10):
         self.capacity = capacity
         self.max_capacity = capacity
+        create_database_sqlite()
 
     def __str__(self):
         """
@@ -159,7 +140,7 @@ class Inventory:
         for element in return_rows_from_database():
             for item in self.inventory[element]:
                 yield item
-        # TODO: modify __iter__, so far not working
+        # TODO: modify __iter__, old version not working
 
     def add_new_item(self, item_name, item_type, modifier_amount):
         """
@@ -206,14 +187,13 @@ if __name__ == "__main__":
     # inventory.add_new_item("Armor", "Plate Armor", "+60 armor")
     # inventory.add_new_item("Helmet", "Plate Helmet", "+60 armor")
     # inventory.add_new_item("Boots", "Plate Boots", "+60 armor")
-    # inventory.add_new_item("HP potion", "small", 2)
+    inventory.add_new_item("HP potion", "small", 2)
     # inventory.add_new_item("Stamina potion", "small", 2)
     # inventory.add_new_item("Mana potion", "small", 2)
-    # print(inventory)
+    print(inventory)
     # inventory.add_new_item("Capacity potion", "small", 2)
     # inventory.remove_item("Stamina potion")
     # print(inventory)
 
     # TODO: połączyć każdego bohatera z plecakiem i ekwipunkiem
     # TODO: grafiki przedmiotów
-    # TODO: ogarnąc baze danych dla imienia i statystyk, żeby można było zwracać w ekranie profilu
