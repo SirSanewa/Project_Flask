@@ -21,7 +21,7 @@
     <table border="1 px solid black" width="100%">
         <tr>
             <td colspan="3" height="80px">
-                {{ name }}, klasa, exp i kasa
+                Imię: {{ name }}, level: {{ level }}, exp: {{ exp }} i kasa
             </td>
         </tr>
         <tr>
@@ -29,28 +29,28 @@
                 Statystyki:
                 <ul type="square">
                     <li>
-                        HP:
+                        HP: {{ hp }}
                     </li>
                     <li>
-                        Mana:
+                        Mana: {{ mana }}
                     </li>
                     <li>
-                        Stamina:
+                        Stamina: {{ stamina }}
                     </li>
                     <li>
-                        Armor:
+                        Armor: {{ armor }}
                     </li>
                     <li>
-                        Attack damage:
+                        Attack damage: {{ attack_dmg }}
                     </li>
                     <li>
-                        Steal chance:
+                        Critic damage chance: {{ chance_to_crit }}%
                     </li>
                     <li>
-                        Critic damage chance:
+                        Steal chance: {{ chance_to_steal }}%
                     </li>
                     <li>
-                        Capacity:
+                        Capacity: {{ capacity }}
                     </li>
                 </ul>
             </td>

@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 from thief import Thief
+import sqlite3
+from main import Hero, return_hero_id
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -22,13 +24,45 @@ def create_new_champion():
     elif password != repeated_password:
         context["error"] = "Wprowadzono błędne hasła"
     return render_template("create_hero.html", **context)
-    #TODO: logowanie postaci
 
-@app.route("/profile")
+
+def return_profile(login, password):
+    sql_connection = sqlite3.connect("database.db")
+    cursor = sql_connection.cursor()
+    query = """
+    SELECT "name", "level", "exp", "hp", "mana", "stamina", "armor", "attack dmg", "chance to crit", "chance to steal", "capacity"
+    FROM "profile"
+    WHERE login = :login AND password = :password;
+    """
+    dictionary = {"login": login, "password": password}
+    cursor.execute(query, dictionary)
+    profile_data = cursor.fetchone()
+    sql_connection.commit()
+    sql_connection.close()
+    return profile_data
+
+
+@app.route("/profile", methods=["get", "post"])
 def profile():
-    name = request.args.get("name")
-    context = {"name": name}
+    login = request.form.get("login")
+    password = request.form.get("password")
+    profile = return_profile(login, password)
+    name, level, exp, hp, mana, stamina, armor, attack_dmg, chance_to_crit, chance_to_steal, capacity = profile
+    context = {"name": name,
+               "level": level,
+               "exp": exp,
+               "hp": hp,
+               "mana": mana,
+               "stamina": stamina,
+               "armor": armor,
+               "attack_dmg": attack_dmg,
+               "chance_to_crit": chance_to_crit,
+               "chance_to_steal": chance_to_steal,
+               "capacity": capacity}
+    if request.method == "get":
+        print("powrót z menu")
     return render_template("profile.html", **context)
+    # TODO: powrót do profilu z menu
 
 
 if __name__ == "__main__":
