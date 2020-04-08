@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS "profile" (
             "id"            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
             "name"          TEXT UNIQUE,
+            "login"         TEXT UNIQUE,
+            "password"      TEXT,
             "level"         INTEGER,
             "exp"           INTEGER,
             "hp"            INTEGER,

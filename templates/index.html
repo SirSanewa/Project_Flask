@@ -13,6 +13,7 @@
         left: 50%;
         margin-right: -50%;
         transform: translate(-50%, -50%);
+        text-align: center;
         }
         p {
         font-size: 30px;
@@ -20,10 +21,13 @@
     </style>
 </head>
 <body>
-    <p>CHOOSE YOUR NAME:</p>
+    <p>LOGIN</p>
     <form action="/profile">
-        <input type="text" name="name" placeholder="NAME">
-        <input type="submit" value="SUBMIT">
+        <input type="text" name="login" placeholder="login">
+        <input type="text" name="password" placeholder="password">
+        <input type="submit" value="LOGIN">
     </form>
+    <br>
+    <a href="/create">Stwórz nową postać</a>
 </body>
 </html>

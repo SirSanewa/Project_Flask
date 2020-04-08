@@ -1,2 +1,2 @@
-INSERT INTO "backpack" ("name", "type", "amount")
-VALUES (:name, :type, :amount);
+INSERT INTO "backpack"
+VALUES (:hero_id, :name, :type, :amount)
