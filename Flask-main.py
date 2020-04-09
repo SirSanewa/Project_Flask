@@ -5,6 +5,9 @@ from main import Hero, return_hero_id
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
+global_login = None
+global_password = None
+
 
 @app.route("/")
 @app.route("/main")
@@ -12,7 +15,7 @@ def main_menu():
     return render_template("index.html")
 
 
-@app.route("/create", methods=["get", "post"])
+@app.route("/create", methods=["GET", "POST"])
 def create_new_champion():
     context = {}
     login = request.form.get("login")
@@ -20,7 +23,7 @@ def create_new_champion():
     repeated_password = request.form.get("repeat_password")
     name = request.form.get("hero_name")
     if password == repeated_password and password is not None and repeated_password is not None:
-        thief = Thief(name, login, password)
+        Thief(name, login, password)
     elif password != repeated_password:
         context["error"] = "Wprowadzono błędne hasła"
     return render_template("create_hero.html", **context)
@@ -44,9 +47,21 @@ def return_profile(login, password):
 
 @app.route("/profile", methods=["get", "post"])
 def profile():
-    login = request.form.get("login")
-    password = request.form.get("password")
-    profile = return_profile(login, password)
+    """
+    Endpoint "/profile" operates on 2 methods(post, get): post is provided by login page(index.html) and get is provided
+    by menu shortcut(menu.html). When calling this endpoint from shortcut menu, login and password are taken from global
+    variables set after logging in and passed to return_profile() to receive most updated data to populate web page.
+    """
+    global global_login
+    global global_password
+    if request.method == "POST":
+        login = request.form.get("login")
+        password = request.form.get("password")
+        profile = return_profile(login, password)
+        global_login = login
+        global_password = password
+    else:
+        profile = return_profile(global_login, global_password)
     name, level, exp, hp, mana, stamina, armor, attack_dmg, chance_to_crit, chance_to_steal, capacity = profile
     context = {"name": name,
                "level": level,
@@ -59,10 +74,7 @@ def profile():
                "chance_to_crit": chance_to_crit,
                "chance_to_steal": chance_to_steal,
                "capacity": capacity}
-    if request.method == "get":
-        print("powrót z menu")
     return render_template("profile.html", **context)
-    # TODO: powrót do profilu z menu
 
 
 if __name__ == "__main__":
