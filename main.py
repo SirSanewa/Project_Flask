@@ -105,6 +105,6 @@ class Hero:
 
 
 if __name__ == "__main__":
-    hero = Hero("Aukasz", 1, 1, 1, 1, 1, 1, 1, 1)
+    hero = Hero("Aukasz", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
     print(hero)
 

@@ -151,15 +151,6 @@ class Inventory:
                f"Hero's backpack has {length_of_backpack} items inside and has space for {difference} more\n" \
                f"Backpack: {return_rows_from_database('backpack', self.hero_id, True)}"
 
-    def __iter__(self):
-        """
-        Allows python to understand how to iterate over type Backpack instances.
-        """
-        for element in return_rows_from_database():
-            for item in self.inventory[element]:
-                yield item
-        # TODO: modify __iter__, old version not working
-
     def add_new_item(self, item_name, item_type, modifier_amount):
         """
         Takes in args and creates item in database. If item already exists in database, function is updating the
@@ -193,9 +184,6 @@ class Inventory:
                 else:
                     remove_from_database(item, self.hero_id)
                     self.capacity += 1
-
-    def upgrade_capacity(self):
-        self.capacity += 10
 
 
 # if __name__ == "__main__":
