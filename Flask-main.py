@@ -75,8 +75,9 @@ def profile():
                "chance_to_steal": chance_to_steal,
                "capacity": capacity}
     return render_template("profile.html", **context)
-    #TODO: zmodyfikować system dodwania przemdiotów do bazy (nie będzie podanych instancji klasy, pozbyć się klas?)
-    #TODO: stworzyć baze danych przedmiotów?
+    # TODO: zmodyfikować system dodwania przemdiotów do bazy (nie będzie podanych instancji klasy, pozbyć się klas?)
+    # TODO: stworzyć baze danych przedmiotów?, zrobić 2 oddzielne joiny na plecak i sprzęt dla łatwości drukowania na stronie?
+
 
 if __name__ == "__main__":
     app.run(debug=True)
