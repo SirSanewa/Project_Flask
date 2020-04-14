@@ -4,30 +4,21 @@
     <meta charset="UTF-8">
     <title>Profile</title>
     <link rel="shortcut icon" href="/static/icon.png">
-    <style>
-        body {
-        background-image: url("/static/background.jpg");
-        height: 100%;
-        }
-        table {
-        table-layout: auto;
-        width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/css/profile.css">
 </head>
 <body>
-    {% extends "menu.html" %}
+    {% extends "menu_2.html" %}
     {% block page_content %}
-    <table border="1 px solid black" width="100%">
+    <table>
         <tr>
-            <td colspan="3" height="80px">
+            <td class="hero_description" colspan="3">
                 Imię: {{ name }}, level: {{ level }}, exp: {{ exp }} i kasa
             </td>
         </tr>
         <tr>
-            <td height="450px" width="25%">
+            <td class="statistics">
                 Statystyki:
-                <ul type="square">
+                <ul>
                     <li>
                         HP: {{ hp }}
                     </li>
@@ -54,11 +45,28 @@
                     </li>
                 </ul>
             </td>
-            <td width="30%">
-                Ekwipunek
+            <td class="equipment">
+                {% if inventory %}
+                {% for element in inventory %}
+                <ul>
+                    {{ element }}
+                </ul>
+                {% endfor %}
+                {% else %}
+                    Nie ma elementów
+                {% endif %}
+
             </td >
-            <td width="45%">
-                Plecak
+            <td class="backpack">
+                {% if backpack %}
+                {% for element in backpack %}
+                <ul>
+                    {{ element }}
+                </ul>
+                {% endfor %}
+                {% else %}
+                    Nie ma elementów
+                {% endif %}
             </td>
         </tr>
     </table>

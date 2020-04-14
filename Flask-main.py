@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template
 from thief import Thief
 import sqlite3
-from main import Hero, return_hero_id
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -33,7 +32,7 @@ def return_profile(login, password):
     sql_connection = sqlite3.connect("database.db")
     cursor = sql_connection.cursor()
     query = """
-    SELECT "name", "level", "exp", "hp", "mana", "stamina", "armor", "attack dmg", "chance to crit", "chance to steal", "capacity"
+    SELECT "id","name", "level", "exp", "hp", "mana", "stamina", "armor", "attack dmg", "chance to crit", "chance to steal", "capacity"
     FROM "profile"
     WHERE login = :login AND password = :password;
     """
@@ -43,6 +42,42 @@ def return_profile(login, password):
     sql_connection.commit()
     sql_connection.close()
     return profile_data
+
+
+def return_backpack(id_number):
+    connection = sqlite3.connect("database.db")
+    connection.execute("PRAGMA foreign_keys = 1;")
+    cursor = connection.cursor()
+    query = """
+    SELECT b.name AS "item", b.type AS "type", b.amount AS "amount"
+    FROM profile as p
+    JOIN backpack as b ON p.id = b.hero_id
+    WHERE p.id = ?;
+    """
+    hero_id = str(id_number)
+    cursor.execute(query, (hero_id,))
+    result = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    return result
+
+
+def return_inventory(id_number):
+    connection = sqlite3.connect("database.db")
+    connection.execute("PRAGMA foreign_keys = 1;")
+    cursor = connection.cursor()
+    query = """
+    SELECT i.name AS "item", i.type AS "type", i.modifier AS "modifier"
+    FROM profile as p
+    JOIN inventory as i ON p.id = i.hero_id
+    WHERE p.id = ? AND i.type IS NOT NULL;
+    """
+    hero_id = str(id_number)
+    cursor.execute(query, (hero_id,))
+    result = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    return result
 
 
 @app.route("/profile", methods=["get", "post"])
@@ -62,7 +97,7 @@ def profile():
         global_password = password
     else:
         profile = return_profile(global_login, global_password)
-    name, level, exp, hp, mana, stamina, armor, attack_dmg, chance_to_crit, chance_to_steal, capacity = profile
+    hero_id, name, level, exp, hp, mana, stamina, armor, attack_dmg, chance_to_crit, chance_to_steal, capacity = profile
     context = {"name": name,
                "level": level,
                "exp": exp,
@@ -74,6 +109,10 @@ def profile():
                "chance_to_crit": chance_to_crit,
                "chance_to_steal": chance_to_steal,
                "capacity": capacity}
+    if return_backpack(hero_id):
+        context.update({"backpack": return_backpack(hero_id)})
+    if return_inventory(hero_id):
+        context.update({"inventory": return_inventory(hero_id)})
     return render_template("profile.html", **context)
     # TODO: zmodyfikować system dodwania przemdiotów do bazy (nie będzie podanych instancji klasy, pozbyć się klas?)
     #  TODO: stworzyć baze danych przedmiotów?, zrobić 2 oddzielne joiny na plecak i sprzęt dla łatwości drukowania
