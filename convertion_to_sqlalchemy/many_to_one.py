@@ -9,7 +9,7 @@ session = DBSession()
 result = session.query(Profile).filter(Profile.id == 1).all()
 
 for element in result:
-    print(f"{element.name} ma na sobie:")
+    print(f"{element.name}(ID: {element.id}) ma na sobie:")
     for item in element.inventory:
         print("-", item.name, item.type, item.modifier)
     print("A w plecaku:")
