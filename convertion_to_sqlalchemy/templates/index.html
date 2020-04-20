@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Name Your Hero</title>
+    <link rel="shortcut icon" href="/static/icon.png">
+    <style>
+        body {
+        background-image: url("/static/background.jpg");
+        margin: 0;
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        }
+        p {
+        font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <p>LOGIN</p>
+    <form action="/profile" method="post">
+        <input type="text" name="login" placeholder="login">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit" value="LOGIN">
+    </form>
+    <br>
+    <a href="/create">Stwórz nową postać</a>
+</body>
+</html>

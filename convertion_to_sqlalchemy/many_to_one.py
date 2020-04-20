@@ -15,3 +15,5 @@ for element in result:
     print("A w plecaku:")
     for item in element.backpack:
         print("-", item.name, item.type, item.amount)
+
+ #TODO: dodawanie postaci(domyślne wartości statystyk, wydrukowanie w html danych z sqlalchemy
