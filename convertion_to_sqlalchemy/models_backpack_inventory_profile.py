@@ -1,8 +1,25 @@
-from sqlalchemy import create_engine, Column, String, Integer, Float, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, Float, ForeignKey, BLOB, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
+
+class AllItemsInventory(Base):
+    __tablename__ = "all_inventory_items"
+
+    item_id = Column(Integer, primary_key=True)
+    image = Column(String, nullable=False)
+    name = Column(String(255))
+    modifier = Column(String(255))
+
+
+class AllItemsBackpack(Base):
+    __tablename__ = "all_backpack_items"
+
+    item_id = Column(Integer, primary_key=True)
+    image = Column(String, nullable=False)
+    name = Column(String(255))
 
 
 class BackpackItem(Base):
@@ -10,9 +27,10 @@ class BackpackItem(Base):
 
     item_id = Column(Integer, primary_key=True)
     hero_id = Column(Integer, unique=False)
-    name = Column(String(255))
-    type = Column(String(255))
+    name = Column(String(255), ForeignKey("all_backpack_items.name"))
     amount = Column(Integer)
+
+    item_data = relationship(AllItemsBackpack)
 
 
 class InventoryItem(Base):
@@ -20,9 +38,9 @@ class InventoryItem(Base):
 
     item_id = Column(Integer, primary_key=True)
     hero_id = Column(Integer, unique=False)
-    name = Column(String(255))
-    type = Column(String(255))
-    modifier = Column(String(255))
+    name = Column(String(255), ForeignKey("all_inventory_items.name"))
+
+    item_data = relationship(AllItemsInventory)
 
 
 class Profile(Base):
@@ -32,7 +50,7 @@ class Profile(Base):
     name = Column(String(255), nullable=False, unique=True)
     login = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    level = Column(Integer, default=0)
+    level = Column(Integer, default=1)
     exp = Column(Integer, default=0)
     hp = Column(Integer, default=150)
     mana = Column(Integer, default=100)

@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template
 from models_backpack_inventory_profile import BackpackItem, InventoryItem, Profile
-import sqlite3
 from session import session_creator
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -35,8 +34,8 @@ def create_new_champion():
 def profile():
     """
     Endpoint "/profile" operates on 2 methods(post, get): post is provided by login page(index.html) and get is provided
-    by menu shortcut(menu.html). When calling this endpoint from shortcut menu, login and password are taken from global
-    variables set after logging in and passed to return_profile() to receive most updated data to populate web page.
+    by menu shortcut(menu.html). When calling this endpoint from shortcut menu, id is taken from global
+    variable set after logging in to receive most updated data to populate web page.
     """
     global global_id
     session = session_creator()
@@ -67,9 +66,6 @@ def profile():
     if result.backpack:
         context["backpack"] = [(element.name, element.type, element.amount) for element in result.backpack]
     return render_template("profile.html", **context)
-    # TODO: zmodyfikować system dodwania przemdiotów do bazy (nie będzie podanych instancji klasy, pozbyć się klas?)
-    #  TODO: stworzyć baze danych przedmiotów?, zrobić 2 oddzielne joiny na plecak i sprzęt dla łatwości drukowania
-    #   na stronie?
     # TODO: jak dodawać bronie? jak zmieniac statystyki?
 
 

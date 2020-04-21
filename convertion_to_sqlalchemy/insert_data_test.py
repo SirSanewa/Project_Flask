@@ -1,4 +1,4 @@
-from models_backpack_inventory_profile import BackpackItem, InventoryItem, Profile
+from models_backpack_inventory_profile import BackpackItem, InventoryItem, AllItemsInventory, AllItemsBackpack, Profile
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import sessionmaker
 
@@ -7,10 +7,11 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 items = [
-    BackpackItem(hero_id=1, name="HP potion", type="small", amount=2),
-    BackpackItem(hero_id=1, name="Mana potion", type="large", amount=2),
-    InventoryItem(hero_id=2, name="Gloves", type="Dragon skin gloves", modifier="+5 armor"),
-    InventoryItem(hero_id=2, name="Armor", type="Sunfire Cape", modifier="+500 HP"),
+    BackpackItem(hero_id=1, name="HP potion small", amount=2),
+    InventoryItem(hero_id=1, name="Brass Armor"),
+    AllItemsInventory(image="test obrazka", name="Brass Armor", modifier="+5 armor"),
+    AllItemsBackpack(image="test obrazka", name="HP potion small"),
+    Profile(name="test", login="test", password="test")
 ]
 
 session.bulk_save_objects(items)

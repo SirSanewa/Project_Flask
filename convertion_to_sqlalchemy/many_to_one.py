@@ -6,14 +6,21 @@ engine = create_engine("sqlite:///database2.db")
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-result = session.query(Profile).filter(Profile.id == 1).all()
+results = session.query(Profile).filter(Profile.id == 1).all()
 
-for element in result:
-    print(f"{element.name}(ID: {element.id}) ma na sobie:")
-    for item in element.inventory:
-        print("-", item.name, item.type, item.modifier)
-    print("A w plecaku:")
-    for item in element.backpack:
-        print("-", item.name, item.type, item.amount)
+# for element in result:
+#     print(f"{element.name}(ID: {element.id}) ma na sobie:")
+#     for item in element.inventory:
+#         print("-", item.name, item.type, item.modifier)
+#     print("A w plecaku:")
+#     for item in element.backpack:
+#         print("-", item.name, item.type, item.amount)
 
- #TODO: dodawanie postaci(domyślne wartości statystyk, wydrukowanie w html danych z sqlalchemy
+for result in results:
+    print(f"{result.name} - ID:{result.id} ma:")
+    for item in result.inventory:
+        print("-", item.name, item.item_data.image, item.item_data.modifier)
+    for item in result.backpack:
+        print("-", item. name, item.item_data.image, item.amount)
+
+ #TODO: dodawanie obrazków do bazy danych(BLOB/LargeBinary)
