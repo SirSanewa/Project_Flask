@@ -22,5 +22,3 @@ for result in results:
         print("-", item.name, item.item_data.image, item.item_data.modifier)
     for item in result.backpack:
         print("-", item. name, item.item_data.image, item.amount)
-
- #TODO: dodawanie obrazków do bazy danych(BLOB/LargeBinary)

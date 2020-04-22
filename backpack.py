@@ -200,5 +200,3 @@ class Inventory:
     # inventory.add_new_item("Capacity potion", "small", 2)
     # inventory.remove_item("Stamina potion")
     # print(inventory)
-
-    # TODO: HTML strona profilowa, grafiki przedmiotów

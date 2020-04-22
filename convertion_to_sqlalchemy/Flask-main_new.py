@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from models_backpack_inventory_profile import BackpackItem, InventoryItem, Profile
 from session import session_creator
+import base64
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 global_id = None
@@ -62,9 +63,9 @@ def profile():
                "chance_to_steal": result.chance_to_steal,
                "capacity": result.capacity}
     if result.inventory:
-        context["inventory"] = [(element.name, element.type, element.modifier) for element in result.inventory]
+        context["inventory"] = [element.item_data.image for element in result.inventory]
     if result.backpack:
-        context["backpack"] = [(element.name, element.type, element.amount) for element in result.backpack]
+        context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.backpack]
     return render_template("profile.html", **context)
     # TODO: jak dodawać bronie? jak zmieniac statystyki?
 

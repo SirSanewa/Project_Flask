@@ -114,10 +114,7 @@ def profile():
     if return_inventory(hero_id):
         context.update({"inventory": return_inventory(hero_id)})
     return render_template("profile.html", **context)
-    # TODO: zmodyfikować system dodwania przemdiotów do bazy (nie będzie podanych instancji klasy, pozbyć się klas?)
-    #  TODO: stworzyć baze danych przedmiotów?, zrobić 2 oddzielne joiny na plecak i sprzęt dla łatwości drukowania
-    #   na stronie?
-    # TODO: jak dodawać bronie? jak zmieniac statystyki?
+
 
 if __name__ == "__main__":
     app.run(debug=True)

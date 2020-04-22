@@ -60,9 +60,8 @@
             <td class="backpack">
                 {% if backpack %}
                 {% for element in backpack %}
-                <ul>
-                    {{ element }}
-                </ul>
+                <img src="data:;base64,{{ element[0] }}" height="50px" width="50px" title="{{ element[1] }}">
+                <br>
                 {% endfor %}
                 {% else %}
                     Nie ma elementów

@@ -9,7 +9,7 @@ class AllItemsInventory(Base):
     __tablename__ = "all_inventory_items"
 
     item_id = Column(Integer, primary_key=True)
-    image = Column(String, nullable=False)
+    image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
     modifier = Column(String(255))
 
@@ -18,7 +18,7 @@ class AllItemsBackpack(Base):
     __tablename__ = "all_backpack_items"
 
     item_id = Column(Integer, primary_key=True)
-    image = Column(String, nullable=False)
+    image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
 
 
