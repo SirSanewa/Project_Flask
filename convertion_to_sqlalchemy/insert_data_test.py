@@ -7,21 +7,33 @@ engine = create_engine("sqlite:///database2.db")
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-
 items = [
-    BackpackItem(hero_id=1, name="Hp_potion", amount=2),
-    BackpackItem(hero_id=1, name="Brass_Armor"),
-    Profile(name="test", login="test", password="test")
+    BackpackItem(hero_id=1, name="Hp_Potion", amount=2),
+    InventoryItem(hero_id=1, name="Brass_Armor"),
+    InventoryItem(hero_id=1, name="Blacksteel_Sword"),
+    InventoryItem(hero_id=1, name="Crocodile_Boots"),
+    InventoryItem(hero_id=1, name="Demon_Helmet"),
+    InventoryItem(hero_id=1, name="Ancient_Shield"),
+    InventoryItem(hero_id=2, name="Ancient_Shield"),
+    InventoryItem(hero_id=1, name="Brass_Legs"),
+    Profile(name="test", login="test", password="test"),
+    Profile(name="test2", login="test2", password="test")
 ]
 
-directory = "static/items"
+directory = "static/items_backpack"
 for file in os.listdir(directory):
-    with open(f"static/items/{file}", "rb") as f:
+    with open(f"{directory}/{file}", "rb") as f:
         byte_file = bytearray(f.read())
         file_name = file.split(".")
         items.append(AllItemsBackpack(image=byte_file, name=file_name[0]))
 
+directory = "static/items_inventory"
+for file in os.listdir(directory):
+    with open(f"{directory}/{file}", "rb") as f:
+        byte_file = bytearray(f.read())
+        file_name = file.split(".")
+        items.append(AllItemsInventory(image=byte_file, name=file_name[0]))
 session.bulk_save_objects(items)
 session.commit()
 
-  # TODO: podzielić przzedmioty na backpack i inventory, stworzyć system wyświetlanie, przezroczstość po najechaniu, statystyki rpzedmiotów po najechaniu
+# TODO: przezroczstość po najechaniu, statystyki rpzedmiotów po najechaniu

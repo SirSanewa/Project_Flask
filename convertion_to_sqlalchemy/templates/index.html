@@ -2,22 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Name Your Hero</title>
+    <title>The Game - Name Your Hero</title>
     <link rel="shortcut icon" href="/static/icon.png">
     <style>
         body {
-        background-image: url("/static/background.jpg");
-        margin: 0;
-        position: absolute;
-        top: 40%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        }
+            background-image: url("/static/background.jpg");
+            margin: 0;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            }
         p {
-        font-size: 30px;
-        }
+            font-size: 30px;
+            }
+        a.link:link, a.link:visited {
+            color: black;
+            text-decoration: underline;
+            }
+        a.link:hover, a.link:active {
+            boarder-left: solid black 1px;
+            color: white;
+            text-decoration: none;
+            }
+
     </style>
 </head>
 <body>
@@ -28,6 +38,6 @@
         <input type="submit" value="LOGIN">
     </form>
     <br>
-    <a href="/create">Stwórz nową postać</a>
+    <a class="link" href="/create">Stwórz nową postać</a>
 </body>
 </html>

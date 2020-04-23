@@ -1,25 +1,25 @@
 body {
     background-image: url("/static/background.jpg");
-    background-color: yellow;
-    height: 100%;
     }
-table {
+table.regular {
     width: 100%;
-    table-layout: auto;
     }
-table,td {
+table.regular td {
     border: 1px solid black;
     }
-td.hero_description {
-    height: 75px;
-    }
-td.statistics {
-    height: 470px;
+table.regular td.statistics {
     width: 25%;
     }
-td.equipment {
+table.regular td.equipment {
     width: 30%;
     }
-td.backpack {
+table.regular td.backpack {
     width: 45%;
+    }
+table.equipment td {
+    text-align: center;
+    border: non;
+    }
+table.equipment td.empty {
+    border: none;
     }

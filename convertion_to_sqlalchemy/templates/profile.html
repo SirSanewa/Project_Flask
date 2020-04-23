@@ -2,65 +2,148 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Profile</title>
+    <title>The Game - Profile</title>
     <link rel="shortcut icon" href="/static/icon.png">
     <link rel="stylesheet" type="text/css" href="/static/css/profile.css">
 </head>
 <body>
-    {% extends "menu_2.html" %}
+    {% extends "menu.html" %}
     {% block page_content %}
-    <table>
+    <table class="regular" height="600">
         <tr>
-            <td class="hero_description" colspan="3">
+            <td class="hero_description" colspan="3" height="20%">
                 Imię: {{ name }}, level: {{ level }}, exp: {{ exp }} i kasa
             </td>
         </tr>
         <tr>
-            <td class="statistics">
-                Statystyki:
-                <ul>
-                    <li>
+            <td class="statistics" height="80%">
+                Statystyki:<br><br>
+                <ul class="statistic_list">
+                    <li class="statistic_list">
                         HP: {{ hp }}
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Mana: {{ mana }}
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Stamina: {{ stamina }}
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Armor: {{ armor }}
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Attack damage: {{ attack_dmg }}
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Critic damage chance: {{ chance_to_crit }}%
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Steal chance: {{ chance_to_steal }}%
                     </li>
-                    <li>
+                    <li class="statistic_list">
                         Capacity: {{ capacity }}
                     </li>
                 </ul>
             </td>
             <td class="equipment">
-                {% if inventory %}
-                {% for element in inventory %}
-                <ul>
-                    {{ element }}
-                </ul>
-                {% endfor %}
-                {% else %}
-                    Nie ma elementów
-                {% endif %}
+                <table class="equipment" width="100%" height="100%">
+                    <tr height="25%">
+                        <td width="33%" class="empty"></td>
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] == 'Helmet'%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                        <td width="33%" class="empty"></td>
+                    </tr>
+                    <tr height="25%">
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] == 'Shield'%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] == 'Armor'%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] in ['Bow', 'Axe', 'Sword', 'Rode']%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr height="25%">
+                        <td width="33%" class="empty"></td>
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] == 'Legs'%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                        <td width="33%" class="empty"></td>
+                    </tr>
+                    <tr height="25%">
+                        <td width="33%" class="empty"></td>
+                        <td width="33%">
+                            {% if inventory %}
+                            {% for element in inventory %}
+                            {% if element[1].split('_')[1] == 'Boots'%}
+                            <img src="data:;base64,{{ element[0] }}" height="80%" width="80%" title="{{ element[1] | replace('_',' ')}}">
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                                Nie ma elementów
+                            {% endif %}
+                        </td>
+                        <td width="33%" class="empty"></td>
+                    </tr>
+
+
+                </table>
+<!--                {% if inventory %}-->
+<!--                {% for element in inventory %}-->
+<!--                <img src="data:;base64,{{ element[0] }}" height="50px" width="50px" title="{{ element[1] | replace('_',' ')}}">-->
+<!--                <br>-->
+<!--                {% endfor %}-->
+<!--                {% else %}-->
+<!--                    Nie ma elementów-->
+<!--                {% endif %}-->
 
             </td >
             <td class="backpack">
                 {% if backpack %}
                 {% for element in backpack %}
-                <img src="data:;base64,{{ element[0] }}" height="50px" width="50px" title="{{ element[1] }}">
+                <img src="data:;base64,{{ element[0] }}" height="50px" width="50px" title="{{ element[1] | replace('_',' ')}}">
                 <br>
                 {% endfor %}
                 {% else %}

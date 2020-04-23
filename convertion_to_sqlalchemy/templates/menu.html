@@ -1,22 +1,57 @@
 {% block links %}
-    <table border="1 px solid black" width="100%">
-        <tr>
-            <td height="60px" width="25%">
-                <form action="/profile" method="GET">
-                    <button type="submit">PROFILE</button>
-                </form>
-            </td>
-            <td width="25%">
-                Sklep
-            </td>
-            <td width="25%">
-                Wyprawa
-            </td>
-            <td width="25%">
-                Questy
-            </td>
-        </tr>
-    </table>
+<style>
+    #menu {
+        float: left;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display:table-cell;
+        }
+    li.small_li, li.big_li {
+        display: flex;
+        align-items: center;
+        float: left;
+        height: 40px;
+        background-color: #12100e;
+        }
+    li.small_li {
+        width:10%;
+        }
+    li.big_li {
+        width:50%;
+        }
+    a.link:link, a.link:visited {
+        color: white;
+        text-decoration: none;
+        }
+    a.link:hover, a.link:active {
+        boarder-left: solid black 1px;
+        color: #bd4656;
+        text-decoration: none;
+        }
+</style>
+<body>
+    <ul id="menu">
+        <li class="big_li">
+        </li>
+        <li class="small_li">
+            <a class="link" href="/profile">PROFILE</a>
+        </li>
+        <li class="small_li">
+            <a class="link" href="/sklep">SKLEP</a>
+        </li >
+        <li class="small_li">
+            <a class="link" href="/wyprawa">WYPRAWA</a>
+        </li>
+        <li class="small_li">
+            <a class="link" href="/questy">QUESTY</a>
+        </li>
+        <li class="small_li">
+            <a class="link" href="/">LOGOUT</a>
+        </li>
+    </ul>
+</body>
 {% endblock %}
 {% block page_content %}
 {% endblock %}

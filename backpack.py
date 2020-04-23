@@ -47,7 +47,7 @@ def insert_data_to_database(item_name, hero_id, item_type, modifier_amount):
 def return_rows_from_database(table_name, hero_id, readable_names=False):
     """
     Takes in table_name and returns tuples list of every element in the table. If readable_names=False(default) the
-    function will return class items which allows itering over them, if readable_name=True return human readable
+    function will return class items_backpack which allows itering over them, if readable_name=True return human readable
     tuple lists. Initiates create_database_sqlite() to check if database exists or to create it if not.
     """
     sql_connection = sqlite3.connect("database.db")
@@ -148,7 +148,7 @@ class Inventory:
         length_of_backpack = len(return_rows_from_database('backpack', self.hero_id, True))
         difference = self.max_capacity - length_of_backpack
         return f"Hero's equipment:\n{return_rows_from_database('inventory', self.hero_id,  True)}.\n" \
-               f"Hero's backpack has {length_of_backpack} items inside and has space for {difference} more\n" \
+               f"Hero's backpack has {length_of_backpack} items_backpack inside and has space for {difference} more\n" \
                f"Backpack: {return_rows_from_database('backpack', self.hero_id, True)}"
 
     def add_new_item(self, item_name, item_type, modifier_amount):

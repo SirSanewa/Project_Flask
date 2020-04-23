@@ -10,6 +10,8 @@ global_id = None
 @app.route("/")
 @app.route("/main")
 def main_menu():
+    global global_id
+    global_id = None
     return render_template("index.html")
 
 
@@ -63,11 +65,12 @@ def profile():
                "chance_to_steal": result.chance_to_steal,
                "capacity": result.capacity}
     if result.inventory:
-        context["inventory"] = [element.item_data.image for element in result.inventory]
+        context["inventory"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.inventory]
     if result.backpack:
         context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.backpack]
     return render_template("profile.html", **context)
-    # TODO: jak dodawać bronie? jak zmieniac statystyki?
+    # TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
+    # TODO: kasa, sklep
 
 
 if __name__ == "__main__":
