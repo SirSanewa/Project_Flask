@@ -27,7 +27,7 @@ def create_new_champion():
         new_profile = Profile(name=name, login=login, password=password)
         session.add(new_profile)
         session.commit()
-        context["message"] = "Poprawnie dodano do bazy! Do boju!"
+        context["message"] = "Poprawnie dodano do armi!"
     elif password != repeated_password:
         context["error"] = "Podane hasła nie są identyczne"
     return render_template("create_hero.html", **context)

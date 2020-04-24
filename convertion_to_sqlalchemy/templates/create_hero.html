@@ -4,61 +4,32 @@
     <meta charset="UTF-8">
     <title>The Game - Create New Hero</title>
     <link rel="shortcut icon" href="/static/icon.png">
-    <style>
-        body {
-        background-image: url("/static/background.jpg");
-        margin: 0;
-        position: absolute;
-        top: 40%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        }
-        p {
-        font-size: 30px;
-        }
-        p.error {
-        font-size: 16px;
-        color: red;
-        }
-        hr {
-        border: none;
-        }
-        div.link a:link, div.link a:visited {
-        color: green;
-        text-decoration: none;
-        }
-        div.link a:hover, div.link a:active {
-        color: white;
-        text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/css/main_menu.css">
 </head>
 <body>
-    <p>Wprowadź dane:</p>
-    <form method="post">
-        Podaj login: <input type="text" name="login" placeholder="login">
-        <hr>
-        Podaj hasło: <input type="password" name="password" placeholder="password">
-        <hr>
-        Powtórz hasło: <input type="password" name="repeat_password" placeholder="password">
-        <hr>
-        Podaj nazwę postaci: <input type="text" name="hero_name" placeholder="name">
-        <hr>
-        <input type="submit" value="REGISTER">
-    </form>
-    {% if error %}
-        <p class="error">
-            {{ error }}
-        </p>
-    {% endif %}
-    {% if message %}
-    {{ message }} <br>
-    <div class="link">
-    <a href="/main">Powrót do ekranu logowania</a>
+    <div class="login">
+        <br><br><br><br>
+        <p>Wprowadź dane:</p>
+        <form method="post">
+            Podaj login: <input type="text" name="login" placeholder="login">
+            <hr>
+            Podaj hasło: <input type="password" name="password" placeholder="password">
+            <hr>
+            Powtórz hasło: <input type="password" name="repeat_password" placeholder="password">
+            <hr>
+            Podaj nazwę postaci: <input type="text" name="hero_name" placeholder="name">
+            <hr><br>
+            <button type="submit">Zarejestruj</button>
+        </form><br><br><br><br>
+        <a href="/" class="link">Powrót do strony głównej</a><br><br>
+        {% if error %}
+            <p class="error">
+                {{ error }}
+            </p>
+        {% endif %}
+        {% if message %}
+        {{ message }} <br><br>
+        {% endif %}
     </div>
-    {% endif %}
-
 </body>
 </html>

@@ -2,42 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The Game - Name Your Hero</title>
+    <title>The Game - Login</title>
     <link rel="shortcut icon" href="/static/icon.png">
-    <style>
-        body {
-            background-image: url("/static/background.jpg");
-            margin: 0;
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            margin-right: -50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            }
-        p {
-            font-size: 30px;
-            }
-        a.link:link, a.link:visited {
-            color: black;
-            text-decoration: underline;
-            }
-        a.link:hover, a.link:active {
-            boarder-left: solid black 1px;
-            color: white;
-            text-decoration: none;
-            }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/css/main_menu.css">
 </head>
 <body>
-    <p>LOGIN</p>
-    <form action="/profile" method="post">
-        <input type="text" name="login" placeholder="login">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit" value="LOGIN">
-    </form>
-    <br>
-    <a class="link" href="/create">Stwórz nową postać</a>
+    <div class="login">
+        <br><br><br><br><br><br><br>
+        <p>Witaj podróżniku</p>
+        <form action="/profile" method="post">
+            <input type="text" name="login" placeholder="login"><br><br>
+            <input type="password" name="password" placeholder="password"><br><br>
+            <button type="submit">Zaloguj</button>
+        </form>
+        <br>
+        <a class="link" href="/create">Dołącz do walki!</a>
+
+    </div>
 </body>
 </html>
