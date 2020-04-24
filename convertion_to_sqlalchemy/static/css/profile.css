@@ -1,11 +1,19 @@
 body {
-    background-image: url("/static/background.jpg");
+    background: url("/static/background.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    margin: 0;
+    height: 100%;
     }
 table.regular {
     width: 100%;
+    border-collapse: separate;
+    border-spacing: 15px;
     }
 table.regular td {
     border: 1px solid black;
+    background: RGBA(156, 152, 142, 0.5);
     }
 table.regular td.statistics {
     width: 25%;
@@ -22,4 +30,10 @@ table.equipment td {
     }
 table.equipment td.empty {
     border: none;
+    }
+td.hero_description {
+    margin-left: 50px;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
     }

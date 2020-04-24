@@ -71,6 +71,7 @@ def profile():
     return render_template("profile.html", **context)
     # TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
     # TODO: kasa, sklep
+    # TODO: przedmioty z diablo 3, zablokwoać komórki przed modyfikacją
 
 
 if __name__ == "__main__":
