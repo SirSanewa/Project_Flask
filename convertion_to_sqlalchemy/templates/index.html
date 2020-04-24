@@ -17,7 +17,11 @@
         </form>
         <br>
         <a class="link" href="/create">Dołącz do walki!</a>
-
-    </div>
+    {% if error %}
+    <p style="color:red; font-size:16px;">
+    {{ error }}
+    </p>
+    {% endif %}
+    </div><br>
 </body>
 </html>

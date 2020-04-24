@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from models_backpack_inventory_profile import BackpackItem, InventoryItem, Profile
 from session import session_creator
 import base64
@@ -8,11 +8,14 @@ global_id = None
 
 
 @app.route("/")
-@app.route("/main")
+@app.route("/error")
 def main_menu():
     global global_id
     global_id = None
-    return render_template("index.html")
+    context = {}
+    if request.path == "/error":
+        context["error"] = "Błąd logowania"
+    return render_template("index.html", **context)
 
 
 @app.route("/create", methods=["GET", "POST"])
@@ -45,10 +48,13 @@ def profile():
     if request.method == "POST":
         login = request.form.get("login")
         password = request.form.get("password")
-        id_result = session.query(Profile)\
-            .filter(Profile.login == login)\
-            .filter(Profile.password == password)\
-            .one()
+        try:
+            id_result = session.query(Profile)\
+                .filter(Profile.login == login)\
+                .filter(Profile.password == password)\
+                .one()
+        except Exception:
+            return redirect("/error")
         global_id = id_result.id
     result = session.query(Profile)\
         .filter(Profile.id == global_id)\
@@ -63,14 +69,16 @@ def profile():
                "attack_dmg": result.attack_dmg,
                "chance_to_crit": result.chance_to_crit,
                "chance_to_steal": result.chance_to_steal,
-               "capacity": result.capacity}
+               "capacity": result.capacity,
+               "money": result.money}
     if result.inventory:
         context["inventory"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.inventory]
     if result.backpack:
         context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.backpack]
     return render_template("profile.html", **context)
+
     # TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
-    # TODO: kasa, sklep
+    # TODO: sklep
     # TODO: przedmioty z diablo 3, zablokwoać komórki przed modyfikacją
 
 

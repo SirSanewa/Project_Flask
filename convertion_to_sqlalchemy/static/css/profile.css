@@ -8,10 +8,10 @@ body {
     }
 table.regular {
     width: 100%;
-    border-collapse: separate;
     border-spacing: 15px;
     }
 table.regular td {
+    border-radius: 2%;
     border: 1px solid black;
     background: RGBA(156, 152, 142, 0.5);
     }
@@ -24,16 +24,23 @@ table.regular td.equipment {
 table.regular td.backpack {
     width: 45%;
     }
-table.equipment td {
-    text-align: center;
-    border: non;
+table.inventory {
+    overflow: hidden;
+    white-space: nowrap;
+    table-layout: fixed;
     }
-table.equipment td.empty {
+table.inventory td {
+    text-align: center;
+    width: 33%;
+    }
+table.inventory td.empty {
     border: none;
     }
-td.hero_description {
-    margin-left: 50px;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
+img.inventory {
+    opacity: 100%;
+    height: 105px;
+    width: 100px;
+    }
+img:hover {
+    opacity: 70%;
     }

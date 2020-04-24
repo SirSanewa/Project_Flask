@@ -10,7 +10,7 @@ session = DBSession()
 items = [
     BackpackItem(hero_id=1, name="Hp_Potion", amount=2),
     InventoryItem(hero_id=1, name="Brass_Armor"),
-    InventoryItem(hero_id=1, name="Blacksteel_Sword"),
+    InventoryItem(hero_id=1, name="Big_Axe"),
     InventoryItem(hero_id=1, name="Crocodile_Boots"),
     InventoryItem(hero_id=1, name="Demon_Helmet"),
     InventoryItem(hero_id=1, name="Ancient_Shield"),

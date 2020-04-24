@@ -60,6 +60,7 @@ class Profile(Base):
     chance_to_steal = Column(Float, default=0.10)
     chance_to_crit = Column(Float, default=0.25)
     capacity = Column(Integer, default=10)
+    money = Column(Integer, default=100)
 
     inventory = relationship(InventoryItem, viewonly=True, uselist=True)
     backpack = relationship(BackpackItem, viewonly=True, uselist=True)
