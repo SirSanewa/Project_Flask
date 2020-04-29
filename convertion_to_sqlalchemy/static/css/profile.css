@@ -4,11 +4,11 @@ body {
     -moz-background-size: cover;
     -o-background-size: cover;
     margin: 0;
-    height: 100%;
+    padding: 0;
     }
 table.regular {
     width: 100%;
-    border-spacing: 15px;
+    border-spacing: 8px;
     }
 table.regular td {
     border-radius: 2%;
@@ -24,22 +24,18 @@ table.regular td.equipment {
 table.regular td.backpack {
     width: 45%;
     }
-table.inventory {
-    overflow: hidden;
-    white-space: nowrap;
-    table-layout: fixed;
-    }
 table.inventory td {
-    text-align: center;
     width: 33%;
     }
 table.inventory td.empty {
     border: none;
     }
 img.inventory {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: auto;
     opacity: 100%;
-    height: 105px;
-    width: 100px;
     }
 img:hover {
     opacity: 70%;

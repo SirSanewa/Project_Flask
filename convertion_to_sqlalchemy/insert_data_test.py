@@ -8,31 +8,34 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 items = [
-    BackpackItem(hero_id=1, name="Hp_Potion", amount=2),
-    InventoryItem(hero_id=1, name="Brass_Armor"),
-    InventoryItem(hero_id=1, name="Big_Axe"),
-    InventoryItem(hero_id=1, name="Crocodile_Boots"),
-    InventoryItem(hero_id=1, name="Demon_Helmet"),
-    InventoryItem(hero_id=1, name="Ancient_Shield"),
-    InventoryItem(hero_id=2, name="Ancient_Shield"),
-    InventoryItem(hero_id=1, name="Brass_Legs"),
+    # BackpackItem(hero_id=1, name="Hp_Potion", amount=2),
+    # InventoryItem(hero_id=1, name="Brass_Armor"),
+    # InventoryItem(hero_id=1, name="Big_Axe"),
+    # InventoryItem(hero_id=1, name="Crocodile_Boots"),
+    # InventoryItem(hero_id=1, name="Demon_Helmet"),
+    InventoryItem(hero_id=1, name="Simple_Axe"),
+    # InventoryItem(hero_id=1, name="Ancient_Shield"),
+    # InventoryItem(hero_id=1, name="Brass_Legs"),
     Profile(name="test", login="test", password="test"),
-    Profile(name="test2", login="test2", password="test")
 ]
-
-directory = "static/items_backpack"
-for file in os.listdir(directory):
-    with open(f"{directory}/{file}", "rb") as f:
-        byte_file = bytearray(f.read())
-        file_name = file.split(".")
-        items.append(AllItemsBackpack(image=byte_file, name=file_name[0]))
 
 directory = "static/items_inventory"
 for file in os.listdir(directory):
     with open(f"{directory}/{file}", "rb") as f:
         byte_file = bytearray(f.read())
         file_name = file.split(".")
-        items.append(AllItemsInventory(image=byte_file, name=file_name[0]))
+        item_elements = file_name[0].split(",")
+        item_name = item_elements[0]
+        modifier = item_elements[1]
+        price = item_elements[2]
+        items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price))
+
+# directory = "static/items_backpack"
+# for file in os.listdir(directory):
+#     with open(f"{directory}/{file}", "rb") as f:
+#         byte_file = bytearray(f.read())
+#         file_name = file.split(".")
+#         items.append(AllItemsBackpack(image=byte_file, name=file_name[0]))
 session.bulk_save_objects(items)
 session.commit()
 

@@ -1,0 +1,81 @@
+body {
+    background: url("/static/shop_background.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    margin: 0;
+    padding: 0;
+    }
+div.inventory{
+    margin-top: 50px;
+    text-align: center;
+    width: 100%;
+    float: left;
+    color: black;
+    }
+div.items {
+    width: 50%;
+    border-radius: 5%;
+    border: 1px solid black;
+    padding: 15px;
+    margin: 0px 10px 10px 100px;
+    background-color: RGBA(156, 152, 142, 0.6);
+    float: left;
+    }
+ul {
+    list-style-type: none;
+    }
+li {
+    text-align: left;
+    color: black;
+    height: 128px;
+    }
+img {
+    float: left;
+    text-align: left;
+    position: relative;
+    top: 0px;
+    }
+div.description_area {
+    height: 100%;
+    width: 70%;
+    float: left;
+    opacity: 1;
+    }
+div.item_description {
+    margin-top: 17px;
+    margin-left: 50px;
+    }
+div.button {
+    height: 100%;
+    width: 19%;
+    float: left;
+    }
+button {
+    margin-top: 50%;
+    margin-left: 17%;
+    background-color: white;
+    color: black;
+    }
+div.shop_menu {
+    border-radius: 5%;
+    border: 1px solid black;
+    text-align: center;
+    margin-left: 5%;
+    width: 20%;
+    background-color: RGBA(156, 152, 142, 0.6);
+    float: left;
+    }
+div.shop_menu li {
+    margin-left: -40px;
+    text-align: center;
+    margin-top: 10px;
+    height: 20px;
+    }
+hr {
+    margin-left: -30px;
+    margin-right: 10px;
+    border-width: 0.2px;
+    color: #12100e;
+    }
+

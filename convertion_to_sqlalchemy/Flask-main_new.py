@@ -1,7 +1,8 @@
 from flask import Flask, request, render_template, redirect
-from models_backpack_inventory_profile import BackpackItem, InventoryItem, Profile
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile
 from session import session_creator
 import base64
+import os
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 global_id = None
@@ -49,15 +50,15 @@ def profile():
         login = request.form.get("login")
         password = request.form.get("password")
         try:
-            id_result = session.query(Profile)\
-                .filter(Profile.login == login)\
-                .filter(Profile.password == password)\
+            id_result = session.query(Profile) \
+                .filter(Profile.login == login) \
+                .filter(Profile.password == password) \
                 .one()
         except Exception:
             return redirect("/error")
         global_id = id_result.id
-    result = session.query(Profile)\
-        .filter(Profile.id == global_id)\
+    result = session.query(Profile) \
+        .filter(Profile.id == global_id) \
         .one()
     context = {"name": result.name,
                "level": result.level,
@@ -72,15 +73,30 @@ def profile():
                "capacity": result.capacity,
                "money": result.money}
     if result.inventory:
-        context["inventory"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.inventory]
+        context["inventory"] = [
+            (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, element.item_data.modifier) for
+            element in result.inventory]
     if result.backpack:
-        context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in result.backpack]
+        context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in
+                               result.backpack]
     return render_template("profile.html", **context)
 
-    # TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
-    # TODO: sklep
-    # TODO: przedmioty z diablo 3, zablokwoać komórki przed modyfikacją
+
+@app.route("/shop")
+def shop():
+    context = {}
+    session = session_creator()
+    result = session.query(AllItemsInventory).all()
+    context["inventory"] = [
+            (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
+            element in result]
+    return render_template("shop.html", **context)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
+# TODO: sklep dokończyć, kupowanie broni
+# TODO: przedmioty z diablo 3,
+# TODO: logger przy błęnym logowaniu

@@ -11,7 +11,8 @@ class AllItemsInventory(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
-    modifier = Column(String(255))
+    modifier = Column(Integer)
+    price = Column(String(255))
 
 
 class AllItemsBackpack(Base):
@@ -20,6 +21,7 @@ class AllItemsBackpack(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
+    price = Column(String(255))
 
 
 class BackpackItem(Base):
