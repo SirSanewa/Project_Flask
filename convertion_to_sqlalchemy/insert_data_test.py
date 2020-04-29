@@ -28,7 +28,8 @@ for file in os.listdir(directory):
         item_name = item_elements[0]
         modifier = item_elements[1]
         price = item_elements[2]
-        items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price))
+        item_type = item_name.split("_")[1]
+        items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
 
 # directory = "static/items_backpack"
 # for file in os.listdir(directory):

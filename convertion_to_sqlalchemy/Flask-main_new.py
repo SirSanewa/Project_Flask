@@ -82,11 +82,13 @@ def profile():
     return render_template("profile.html", **context)
 
 
-@app.route("/shop")
-def shop():
+@app.route("/shop/<text>")
+def shop(text):
     context = {}
     session = session_creator()
-    result = session.query(AllItemsInventory).all()
+    result = session.query(AllItemsInventory)\
+        .filter(AllItemsInventory.type == text)\
+        .all()
     context["inventory"] = [
             (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
             element in result]
@@ -97,6 +99,6 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 # TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
-# TODO: sklep dokończyć, kupowanie broni
+# TODO: sklep dokończyć, kupowanie broni, wypisywanie ich po cenie
 # TODO: przedmioty z diablo 3,
 # TODO: logger przy błęnym logowaniu

@@ -13,6 +13,7 @@ class AllItemsInventory(Base):
     name = Column(String(255))
     modifier = Column(Integer)
     price = Column(String(255))
+    type = Column(String(255))
 
 
 class AllItemsBackpack(Base):
