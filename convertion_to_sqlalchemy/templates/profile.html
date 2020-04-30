@@ -13,7 +13,7 @@
     <table class="regular" height="400px">
         <tr>
             <td class="hero_description"  height="45" colspan="3">
-                Imię: {{ name }}, level: {{ level }}, exp: {{ exp }} i {{money}}$
+                <a>Imię: {{ name }}, level: {{ level }}, exp: {{ exp }} i {{money}}$</a>
             </td>
         </tr>
         <tr>
@@ -51,79 +51,55 @@
                     <tr height="132px">
                         <td class="empty"></td>
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] == 'Helmet'%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                         <td class="empty"></td>
                     </tr>
                     <tr height="132px">
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] in ['Bow', 'Axe', 'Sword', 'Rode']%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] == 'Armor'%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] == 'Shield'%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                     </tr>
                     <tr height="132px">
                         <td class="empty" rowspan="2"></td>
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] == 'Legs'%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                         <td class="empty" rowspan="2"></td>
                     </tr>
                     <tr height="132px">
                         <td>
-                            {% if inventory %}
                             {% for element in inventory %}
                             {% if element[1].split('_')[1] == 'Boots'%}
-                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2]}}">
+                            <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace('_',' ')}}">
                             {% endif %}
                             {% endfor %}
-                            {% else %}
-                                Nie ma elementów
-                            {% endif %}
                         </td>
                     </tr>
                 </table>

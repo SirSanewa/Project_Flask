@@ -9,27 +9,32 @@
     {% extends "menu.html" %}
     {% block page_content %}
     <div class="inventory">
-        <div class="shop_menu">
-            <ul>
-                <hr><li>
-                    <a class="link" href="/shop/Weapons">Bronie</a>
-                </li><hr>
-                <li>
-                    <a class="link" href="/shop/Shield">Tarcze</a>
-                </li><hr>
-                <li>
-                    <a class="link" href="/shop/Armor">Zbroje</a>
-                </li><hr>
-                <li>
-                    <a class="link" href="/shop/Helmet">Hełmy</a>
-                </li><hr>
-                <li>
-                    <a class="link" href="/shop/Legs">Spodnie</a>
-                </li><hr>
-                <li>
-                    <a class="link" href="/shop/Boots">Buty</a>
-                </li><hr>
-            </ul>
+        <div class="data">
+            <div class="money">
+                Pieniądze: {{ money }}$
+            </div>
+            <div class="shop_menu">
+                <ul>
+                    <hr><li>
+                        <a class="link" href="/shop/Weapons">Bronie</a>
+                    </li><hr>
+                    <li>
+                        <a class="link" href="/shop/Shield">Tarcze</a>
+                    </li><hr>
+                    <li>
+                        <a class="link" href="/shop/Armor">Zbroje</a>
+                    </li><hr>
+                    <li>
+                        <a class="link" href="/shop/Helmet">Hełmy</a>
+                    </li><hr>
+                    <li>
+                        <a class="link" href="/shop/Legs">Spodnie</a>
+                    </li><hr>
+                    <li>
+                        <a class="link" href="/shop/Boots">Buty</a>
+                    </li><hr>
+                </ul>
+            </div>
         </div>
         <div class="items">
             <br>

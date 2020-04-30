@@ -95,9 +95,14 @@ def shop(text):
         result = session.query(AllItemsInventory) \
             .filter(AllItemsInventory.type == text) \
             .all()
+    global global_id
+    money_result = session.query(Profile)\
+        .filter(Profile.id == global_id)\
+        .one()
     context["inventory"] = [
             (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
             element in result]
+    context["money"] = money_result.money
     return render_template("shop.html", **context)
 
 

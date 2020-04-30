@@ -11,9 +11,9 @@ table.regular {
     border-spacing: 8px;
     }
 table.regular td {
-    border-radius: 2%;
+    border-radius: 25px;
     border: 1px solid black;
-    background: RGBA(156, 152, 142, 0.5);
+    background-color: RGBA(156, 152, 142, 0.6);
     }
 table.regular td.statistics {
     width: 25%;
@@ -26,6 +26,7 @@ table.regular td.backpack {
     }
 table.inventory td {
     width: 33%;
+    background-color: transparent;
     }
 table.inventory td.empty {
     border: none;
@@ -39,4 +40,7 @@ img.inventory {
     }
 img:hover {
     opacity: 70%;
+    }
+td.hero_description a{
+    margin-left: 30px;
     }
