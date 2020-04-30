@@ -93,7 +93,8 @@ def shop(text):
             .all()
     else:
         result = session.query(AllItemsInventory) \
-            .filter(AllItemsInventory.type == text) \
+            .filter(AllItemsInventory.type == text)\
+            .order_by(asc(AllItemsInventory.price))\
             .all()
     global global_id
     money_result = session.query(Profile)\
