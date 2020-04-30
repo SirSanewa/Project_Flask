@@ -11,8 +11,8 @@ class AllItemsInventory(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
-    modifier = Column(Integer)
-    price = Column(String(255))
+    modifier = Column(String(255))
+    price = Column(Integer)
     type = Column(String(255))
 
 
@@ -22,7 +22,7 @@ class AllItemsBackpack(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
-    price = Column(String(255))
+    price = Column(Integer)
 
 
 class BackpackItem(Base):
@@ -61,7 +61,7 @@ class Profile(Base):
     armor = Column(Integer, default=50)
     attack_dmg = Column(Integer, default=10)
     chance_to_steal = Column(Float, default=0.10)
-    chance_to_crit = Column(Float, default=0.25)
+    chance_to_crit = Column(Float, default=0.15)
     capacity = Column(Integer, default=10)
     money = Column(Integer, default=100)
 

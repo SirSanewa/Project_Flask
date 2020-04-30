@@ -23,11 +23,11 @@ directory = "static/items_inventory"
 for file in os.listdir(directory):
     with open(f"{directory}/{file}", "rb") as f:
         byte_file = bytearray(f.read())
-        file_name = file.split(".")
+        file_name = file.split("|")
         item_elements = file_name[0].split(",")
         item_name = item_elements[0]
         modifier = item_elements[1]
-        price = item_elements[2]
+        price = item_elements[2].split(".")[0]
         item_type = item_name.split("_")[1]
         items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
 

@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect
 from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile
 from session import session_creator
 import base64
-import os
+from sqlalchemy import asc
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 global_id = None
@@ -86,9 +86,15 @@ def profile():
 def shop(text):
     context = {}
     session = session_creator()
-    result = session.query(AllItemsInventory)\
-        .filter(AllItemsInventory.type == text)\
-        .all()
+    if text == "Weapons":
+        result = session.query(AllItemsInventory) \
+            .filter(AllItemsInventory.type.in_(["Sword", "Axe", "Dagger", "Mace"]))\
+            .order_by(asc(AllItemsInventory.price))\
+            .all()
+    else:
+        result = session.query(AllItemsInventory) \
+            .filter(AllItemsInventory.type == text) \
+            .all()
     context["inventory"] = [
             (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
             element in result]
