@@ -84,3 +84,7 @@ div.money {
     padding-top: 15px;
     padding-bottom: 15px;
     }
+p.error {
+    margin-bottom: 0px;
+    color: red;
+    }

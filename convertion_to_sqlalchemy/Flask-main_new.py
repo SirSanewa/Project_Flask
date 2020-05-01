@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect
 from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile
 from session import session_creator
 import base64
-from sqlalchemy import asc
+from sqlalchemy import asc, update
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 global_id = None
@@ -103,6 +103,23 @@ def shop(text):
     context["inventory"] = [
             (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
             element in result]
+    value = request.args.get("item")
+    if value is None:
+        pass
+    else:
+        #zwraca wartości wybranego przedmiotu
+        item_result = session.query(AllItemsInventory)\
+            .filter(AllItemsInventory.name == value)\
+            .one()
+        item_value = item_result.price
+
+        #modyfikuje posiadaną kasę
+        budget_result = money_result.money - item_value
+        if budget_result < 0:
+            context["error"] = "Brak środków"
+        else:
+            money_result.money -= item_value
+            session.commit()
     context["money"] = money_result.money
     return render_template("shop.html", **context)
 
@@ -110,7 +127,8 @@ def shop(text):
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: jak dodawać bronie? jak zmieniac statystyki(modyfikatory)?
-# TODO: sklep dokończyć, kupowanie broni, wypisywanie ich po cenie
+# TODO: jak zmieniac statystyki(modyfikatory)?
+# TODO: sklep dokończyć, kupowanie broni
 # TODO: przedmioty z diablo 3,
 # TODO: logger przy błęnym logowaniu
+# TODO: co jeśli więcej niż jedna broń? przerzucanie do plecaka?

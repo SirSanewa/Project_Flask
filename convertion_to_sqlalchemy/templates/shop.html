@@ -12,6 +12,9 @@
         <div class="data">
             <div class="money">
                 Pieniądze: {{ money }}$
+                {% if error %}
+                <p class="error">{{ error }}</p>
+                {% endif %}
             </div>
             <div class="shop_menu">
                 <ul>
@@ -54,8 +57,8 @@
                         </div>
                     </div>
                     <div class="button">
-                        <form action="/profile">
-                            <button value="{{ item[1] }}" type="submit">kup</button>
+                        <form>
+                            <button name="item" value="{{ item[1] }}" type="submit">kup</button>
                         </form>
                     </div>
                 </li>
