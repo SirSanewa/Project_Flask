@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, redirect
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem
 from session import session_creator
 import base64
-from sqlalchemy import asc, update
+from sqlalchemy import asc
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 global_id = None
@@ -74,61 +74,67 @@ def profile():
                "money": result.money}
     if result.inventory:
         context["inventory"] = [
-            (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, element.item_data.modifier) for
-            element in result.inventory]
+            (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, element.item_data.modifier,
+             element.item_data.type) for element in result.inventory]
     if result.backpack:
         context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in
                                result.backpack]
     return render_template("profile.html", **context)
 
 
-@app.route("/shop/<text>")
+@app.route("/shop/<text>", methods=["get", "post"])
 def shop(text):
     context = {}
     session = session_creator()
-    if text == "Weapons":
-        result = session.query(AllItemsInventory) \
-            .filter(AllItemsInventory.type.in_(["Sword", "Axe", "Dagger", "Mace"]))\
-            .order_by(asc(AllItemsInventory.price))\
-            .all()
-    else:
-        result = session.query(AllItemsInventory) \
-            .filter(AllItemsInventory.type == text)\
-            .order_by(asc(AllItemsInventory.price))\
-            .all()
+    result = session.query(AllItemsInventory) \
+        .filter(AllItemsInventory.type == text)\
+        .order_by(asc(AllItemsInventory.price))\
+        .all()
     global global_id
-    money_result = session.query(Profile)\
+    profile_result = session.query(Profile)\
         .filter(Profile.id == global_id)\
         .one()
     context["inventory"] = [
             (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
             element in result]
-    value = request.args.get("item")
-    if value is None:
+
+    new_item_name = request.form.get("item")
+    if new_item_name is None:
         pass
     else:
         #zwraca wartości wybranego przedmiotu
         item_result = session.query(AllItemsInventory)\
-            .filter(AllItemsInventory.name == value)\
+            .filter(AllItemsInventory.name == new_item_name)\
             .one()
-        item_value = item_result.price
+        new_item_price = item_result.price
+        new_item_type = item_result.type
 
         #modyfikuje posiadaną kasę
-        budget_result = money_result.money - item_value
+        budget_result = profile_result.money - new_item_price
         if budget_result < 0:
             context["error"] = "Brak środków"
         else:
-            money_result.money -= item_value
+            if new_item_type in [element.item_data.type for element in profile_result.inventory]:
+                for element in profile_result.inventory:
+                    if new_item_type == element.item_data.type:
+                        profile_result.money += (element.item_data.price * 0.75)
+                        element.name = new_item_name
+                        session.commit()
+                        print(element.item_data.modifier)
+            else:
+                item = InventoryItem(hero_id=global_id, name=new_item_name)
+                session.add(item)
+            profile_result.money -= new_item_price
             session.commit()
-    context["money"] = money_result.money
+
+    context["money"] = profile_result.money
     return render_template("shop.html", **context)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: jak zmieniac statystyki(modyfikatory)?
-# TODO: sklep dokończyć, kupowanie broni
+# TODO: jak zmieniac statystyki(modyfikatory)!!!!!!!!!!!!!!!?
+# TODO: sklep dokończyć,
 # TODO: przedmioty z diablo 3,
 # TODO: logger przy błęnym logowaniu
-# TODO: co jeśli więcej niż jedna broń? przerzucanie do plecaka?

@@ -58,11 +58,14 @@ button {
     color: black;
     }
 div.shop_menu, div.money {
-    margin-top: 50px;
+    margin-top: 0px;
     text-align: center;
     margin-left: 5%;
     width: 100%;
     }
+div.shop_menu {
+    margin-top: 40px;
+}
 div.shop_menu li {
     margin-left: -40px;
     text-align: inherit;
@@ -87,4 +90,9 @@ div.money {
 p.error {
     margin-bottom: 0px;
     color: red;
+    }
+p.shop_info {
+    height: 20px;
+    margin-top: -45px;
+    background-color: yellow;
     }

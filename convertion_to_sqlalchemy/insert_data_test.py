@@ -8,14 +8,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 items = [
-    # BackpackItem(hero_id=1, name="Hp_Potion", amount=2),
-    # InventoryItem(hero_id=1, name="Brass_Armor"),
-    # InventoryItem(hero_id=1, name="Big_Axe"),
-    # InventoryItem(hero_id=1, name="Crocodile_Boots"),
-    # InventoryItem(hero_id=1, name="Demon_Helmet"),
     InventoryItem(hero_id=1, name="Simple_Axe"),
-    # InventoryItem(hero_id=1, name="Ancient_Shield"),
-    # InventoryItem(hero_id=1, name="Brass_Legs"),
     Profile(name="test", login="test", password="test"),
 ]
 
@@ -29,6 +22,8 @@ for file in os.listdir(directory):
         modifier = item_elements[1]
         price = item_elements[2].split(".")[0]
         item_type = item_name.split("_")[1]
+        if item_type in ["Axe", "Mace", "Sword", "Dagger"]:
+            item_type = "Weapon"
         items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
 
 # directory = "static/items_backpack"
