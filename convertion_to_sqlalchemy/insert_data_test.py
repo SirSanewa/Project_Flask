@@ -8,7 +8,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 items = [
-    InventoryItem(hero_id=1, name="Simple_Axe"),
     Profile(name="test", login="test", password="test"),
 ]
 

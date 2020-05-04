@@ -82,6 +82,41 @@ def profile():
     return render_template("profile.html", **context)
 
 
+def change_statistic(profile_data, modifier, plus=True):
+    session = session_creator()
+    split_modifier = modifier.split(";")
+    print(split_modifier)
+    for data in split_modifier:
+        element_component = data.split(" ")
+        print(element_component)
+        dictionary = {"attack_dmg": profile_data.attack_dmg,
+                      "chance_to_crit": profile_data.chance_to_crit,
+                      "hp": profile_data.hp,
+                      "mana": profile_data.mana,
+                      "stamina": profile_data.stamina,
+                      "armor": profile_data.armor,
+                      "chance_to_steal": profile_data.chance_to_steal}
+        if "." in element_component[0]:
+            if plus:
+                session.query(Profile) \
+                    .filter(Profile.id == global_id) \
+                    .update({element_component[1]: dictionary[element_component[1]] + float(element_component[0])})
+            else:
+                session.query(Profile) \
+                    .filter(Profile.id == global_id) \
+                    .update({element_component[1]: dictionary[element_component[1]] - float(element_component[0])})
+        else:
+            if plus:
+                session.query(Profile) \
+                    .filter(Profile.id == global_id) \
+                    .update({element_component[1]: dictionary[element_component[1]] + int(element_component[0])})
+            else:
+                session.query(Profile) \
+                    .filter(Profile.id == global_id) \
+                    .update({element_component[1]: dictionary[element_component[1]] - int(element_component[0])})
+    session.commit()
+
+
 @app.route("/shop/<text>", methods=["get", "post"])
 def shop(text):
     context = {}
@@ -108,8 +143,9 @@ def shop(text):
             .one()
         new_item_price = item_result.price
         new_item_type = item_result.type
+        new_item_modifier = item_result.modifier
 
-        #modyfikuje posiadaną kasę
+        #modyfikuje posiadaną kasę i statystyki
         budget_result = profile_result.money - new_item_price
         if budget_result < 0:
             context["error"] = "Brak środków"
@@ -118,15 +154,16 @@ def shop(text):
                 for element in profile_result.inventory:
                     if new_item_type == element.item_data.type:
                         profile_result.money += (element.item_data.price * 0.75)
+                        change_statistic(profile_result, element.item_data.modifier, plus=False)
                         element.name = new_item_name
                         session.commit()
-                        print(element.item_data.modifier)
+                        change_statistic(profile_result, element.item_data.modifier)
             else:
                 item = InventoryItem(hero_id=global_id, name=new_item_name)
                 session.add(item)
+                change_statistic(profile_result, new_item_modifier)
             profile_result.money -= new_item_price
             session.commit()
-
     context["money"] = profile_result.money
     return render_template("shop.html", **context)
 
@@ -134,7 +171,6 @@ def shop(text):
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: jak zmieniac statystyki(modyfikatory)!!!!!!!!!!!!!!!?
 # TODO: sklep dokończyć,
 # TODO: przedmioty z diablo 3,
 # TODO: logger przy błęnym logowaniu
