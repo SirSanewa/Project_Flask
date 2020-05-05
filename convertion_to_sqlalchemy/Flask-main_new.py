@@ -18,6 +18,10 @@ global_id = None
 @app.route("/")
 @app.route("/error")
 def main_menu():
+    """
+    Main page that includes login area. If user fails to log in there will be logg created in "loggs.txt"
+    :return:
+    """
     global global_id
     global_id = None
     context = {}
@@ -30,6 +34,10 @@ def main_menu():
 
 @app.route("/create", methods=["GET", "POST"])
 def create_new_champion():
+    """
+    Allows to create new character with passed data.
+    :return:
+    """
     session = session_creator()
     context = {}
     login = request.form.get("login")
@@ -37,16 +45,20 @@ def create_new_champion():
     repeated_password = request.form.get("repeat_password")
     name = request.form.get("hero_name")
     if password and login and name:
-        if password == repeated_password:
-            if name in ["Lukasz", "Łukasz"]:
-                new_profile = Profile(name=name, login=login, password=password, attack_dmg=15)
-            else:
-                new_profile = Profile(name=name, login=login, password=password)
-            session.add(new_profile)
-            session.commit()
-            context["message"] = "Poprawnie dodano do armi!"
-        elif password != repeated_password:
-            context["error"] = "Podane hasła nie są identyczne"
+        logins_names_list = session.query(Profile).all()
+        if login not in [element.login for element in logins_names_list] and name not in [element.login for element in logins_names_list]:
+            if password == repeated_password:
+                if name in ["Lukasz", "Łukasz"]:
+                    new_profile = Profile(name=name, login=login, password=password, attack_dmg=15)
+                else:
+                    new_profile = Profile(name=name, login=login, password=password)
+                session.add(new_profile)
+                session.commit()
+                context["message"] = "Poprawnie dodano do armi!"
+            elif password != repeated_password:
+                context["error"] = "Podane hasła nie są identyczne"
+        else:
+            context["error"] = "Podany login lub nazwa postaci są już zajęte"
     elif password == "" or login == "" or name == "":
         context["error"] = "Pozostawiono puste pola"
     return render_template("create_hero.html", **context)
@@ -57,7 +69,7 @@ def profile():
     """
     Endpoint "/profile" operates on 2 methods(post, get): post is provided by login page(index.html) and get is provided
     by menu shortcut(menu.html). When calling this endpoint from shortcut menu, id is taken from global
-    variable set after logging in to receive most updated data to populate web page.
+    variable set after logging in to receive most updated data to populate web page. Displays all characters data.
     """
     global global_id
     session = session_creator()
@@ -98,6 +110,12 @@ def profile():
 
 
 def change_statistic(profile_data, modifier, plus=True):
+    """
+    Takes in profile_data(data from sql of the profile), modifier(statistics that are suppose to be changed and their
+    values) and plus= parameter to determine if statistics are being added or removed. Makes requested changes in
+    database.
+    :return:
+    """
     session = session_creator()
     split_modifier = modifier.split(";")
     for data in split_modifier:
@@ -132,6 +150,12 @@ def change_statistic(profile_data, modifier, plus=True):
 
 @app.route("/shop/<text>", methods=["get", "post"])
 def shop(text):
+    """
+    Takes in text which determines what kind of items are being displayed(default showing 'Weapon'). Allows to add new
+    items to inventory or modify currently equiped. After each purchase modifies money amount in database and statistics
+    with a use of change_statistics().
+    :return:
+    """
     context = {}
     session = session_creator()
     result = session.query(AllItemsInventory) \
@@ -185,6 +209,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 # TODO: sklep dokończyć,
-# TODO: przedmioty z diablo 3,
 # TODO: questy i walka(mapa)
 # TODO: backpack
