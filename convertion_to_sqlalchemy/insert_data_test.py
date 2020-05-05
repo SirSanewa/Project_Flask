@@ -33,5 +33,3 @@ for file in os.listdir(directory):
 #         items.append(AllItemsBackpack(image=byte_file, name=file_name[0]))
 session.bulk_save_objects(items)
 session.commit()
-
-# TODO: przezroczstość po najechaniu, statystyki rpzedmiotów po najechaniu

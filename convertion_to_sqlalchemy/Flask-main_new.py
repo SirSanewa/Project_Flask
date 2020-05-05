@@ -3,8 +3,15 @@ from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventor
 from session import session_creator
 import base64
 from sqlalchemy import asc
+import logging
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+
+formatter = logging.Formatter("%(asctime)s- [%(levelname)s]: %(message)s")
+handler = logging.FileHandler('loggs.txt', encoding="utf-8")
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+
 global_id = None
 
 
@@ -15,6 +22,8 @@ def main_menu():
     global_id = None
     context = {}
     if request.path == "/error":
+        ip = request.remote_addr
+        app.logger.error(f"Użytkownik {ip} wprowadził niepoprawne dane logowania")
         context["error"] = "Błąd logowania"
     return render_template("index.html", **context)
 
@@ -27,13 +36,19 @@ def create_new_champion():
     password = request.form.get("password")
     repeated_password = request.form.get("repeat_password")
     name = request.form.get("hero_name")
-    if password == repeated_password and password is not None and repeated_password is not None:
-        new_profile = Profile(name=name, login=login, password=password)
-        session.add(new_profile)
-        session.commit()
-        context["message"] = "Poprawnie dodano do armi!"
-    elif password != repeated_password:
-        context["error"] = "Podane hasła nie są identyczne"
+    if password and login and name:
+        if password == repeated_password:
+            if name in ["Lukasz", "Łukasz"]:
+                new_profile = Profile(name=name, login=login, password=password, attack_dmg=15)
+            else:
+                new_profile = Profile(name=name, login=login, password=password)
+            session.add(new_profile)
+            session.commit()
+            context["message"] = "Poprawnie dodano do armi!"
+        elif password != repeated_password:
+            context["error"] = "Podane hasła nie są identyczne"
+    elif password == "" or login == "" or name == "":
+        context["error"] = "Pozostawiono puste pola"
     return render_template("create_hero.html", **context)
 
 
@@ -85,10 +100,8 @@ def profile():
 def change_statistic(profile_data, modifier, plus=True):
     session = session_creator()
     split_modifier = modifier.split(";")
-    print(split_modifier)
     for data in split_modifier:
         element_component = data.split(" ")
-        print(element_component)
         dictionary = {"attack_dmg": profile_data.attack_dmg,
                       "chance_to_crit": profile_data.chance_to_crit,
                       "hp": profile_data.hp,
@@ -145,7 +158,7 @@ def shop(text):
         new_item_type = item_result.type
         new_item_modifier = item_result.modifier
 
-        #modyfikuje posiadaną kasę i statystyki
+        #modyfikuje posiadaną kasę i statystyki(usuwa stare statystyki i dodaje nowe)
         budget_result = profile_result.money - new_item_price
         if budget_result < 0:
             context["error"] = "Brak środków"
@@ -173,4 +186,5 @@ if __name__ == "__main__":
 
 # TODO: sklep dokończyć,
 # TODO: przedmioty z diablo 3,
-# TODO: logger przy błęnym logowaniu
+# TODO: questy i walka(mapa)
+# TODO: backpack
