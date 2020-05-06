@@ -91,8 +91,11 @@ def profile():
                "level": result.level,
                "exp": result.exp,
                "hp": result.hp,
+               "max_hp": result.max_hp,
                "mana": result.mana,
+               "max_mana": result.max_mana,
                "stamina": result.stamina,
+               "max_stamina": result.max_stamina,
                "armor": result.armor,
                "attack_dmg": result.attack_dmg,
                "chance_to_crit": result.chance_to_crit,
@@ -117,21 +120,33 @@ def change_statistic(profile_data, modifier, plus=True):
     :return:
     """
     session = session_creator()
+    dictionary = {"attack_dmg": profile_data.attack_dmg,
+                  "chance_to_crit": profile_data.chance_to_crit,
+                  "max_hp": profile_data.max_hp,
+                  "max_mana": profile_data.max_mana,
+                  "max_stamina": profile_data.max_stamina,
+                  "armor": profile_data.armor,
+                  "chance_to_steal": profile_data.chance_to_steal}
+    multi_stat = {"max_hp": ["hp", profile_data.hp],
+                "max_mana": ["mana", profile_data.mana],
+                "max_stamina": ["stamina", profile_data.stamina]}
     split_modifier = modifier.split(";")
     for data in split_modifier:
         element_component = data.split(" ")
-        dictionary = {"attack_dmg": profile_data.attack_dmg,
-                      "chance_to_crit": profile_data.chance_to_crit,
-                      "hp": profile_data.hp,
-                      "mana": profile_data.mana,
-                      "stamina": profile_data.stamina,
-                      "armor": profile_data.armor,
-                      "chance_to_steal": profile_data.chance_to_steal}
-        if "." in element_component[0]:
+        if element_component[1] in multi_stat:
             if plus:
                 session.query(Profile) \
                     .filter(Profile.id == global_id) \
-                    .update({element_component[1]: dictionary[element_component[1]] + float(element_component[0])})
+                    .update({multi_stat[element_component[1]][0]: multi_stat[element_component[1]][1] + int(element_component[0])})
+            else:
+                session.query(Profile) \
+                    .filter(Profile.id == global_id) \
+                    .update({multi_stat[element_component[1]][0]: multi_stat[element_component[1]][1] - int(element_component[0])})
+        if "." in element_component[0]:
+            if plus:
+                session.query(Profile) \
+                        .filter(Profile.id == global_id) \
+                        .update({element_component[1]: dictionary[element_component[1]] + float(element_component[0])})
             else:
                 session.query(Profile) \
                     .filter(Profile.id == global_id) \

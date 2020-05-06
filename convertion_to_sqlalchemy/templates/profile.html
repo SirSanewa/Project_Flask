@@ -21,13 +21,13 @@
                 Statystyki:<br><br>
                 <ul class="statistic_list">
                     <li class="statistic_list">
-                        HP: {{ hp }}
+                        HP: {{ hp }}/{{ max_hp }}
                     </li>
                     <li class="statistic_list">
-                        Mana: {{ mana }}
+                        Mana: {{ mana }}/{{ max_mana }}
                     </li>
                     <li class="statistic_list">
-                        Stamina: {{ stamina }}
+                        Stamina: {{ stamina }}/{{ max_stamina }}
                     </li>
                     <li class="statistic_list">
                         Armor: {{ armor }}
@@ -36,10 +36,10 @@
                         Attack damage: {{ attack_dmg }}
                     </li>
                     <li class="statistic_list">
-                        Critic damage chance: {{ chance_to_crit | round(2) }}%
+                        Critic damage chance: {{ chance_to_crit | round(2) }}
                     </li>
                     <li class="statistic_list">
-                        Steal chance: {{ chance_to_steal | round(2) }}%
+                        Steal chance: {{ chance_to_steal | round(2) }}
                     </li>
                     <li class="statistic_list">
                         Capacity: {{ capacity }}
