@@ -107,7 +107,7 @@
             <td class="backpack">
                 {% if backpack %}
                 {% for element in backpack %}
-                <img src="data:;base64,{{ element[0] }}" height="50px" width="50px" title="{{ element[1] | replace('_',' ')}}">
+                <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace(';',', ') | replace('_',' ')}}">
                 <br>
                 {% endfor %}
                 {% else %}

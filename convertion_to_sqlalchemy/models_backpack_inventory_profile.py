@@ -22,7 +22,9 @@ class AllItemsBackpack(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
+    modifier = Column(String(255))
     price = Column(Integer)
+    type = Column(String(255))
 
 
 class BackpackItem(Base):
@@ -31,7 +33,6 @@ class BackpackItem(Base):
     item_id = Column(Integer, primary_key=True)
     hero_id = Column(Integer, unique=False)
     name = Column(String(255), ForeignKey("all_backpack_items.name"))
-    amount = Column(Integer)
 
     item_data = relationship(AllItemsBackpack)
 

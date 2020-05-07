@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem
 from session import session_creator
 import base64
 from sqlalchemy import asc
@@ -48,8 +48,8 @@ def create_new_champion():
         logins_names_list = session.query(Profile).all()
         if login not in [element.login for element in logins_names_list] and name not in [element.login for element in logins_names_list]:
             if password == repeated_password:
-                if name in ["Lukasz", "Łukasz"]:
-                    new_profile = Profile(name=name, login=login, password=password, attack_dmg=15)
+                if any(substring in name for substring in ["Lukasz", "lukasz", "Łukasz", "łukasz"]):
+                    new_profile = Profile(name=name, login=login, password=password, attack_dmg=15, money=150)
                 else:
                     new_profile = Profile(name=name, login=login, password=password)
                 session.add(new_profile)
@@ -107,8 +107,9 @@ def profile():
             (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, element.item_data.modifier,
              element.item_data.type) for element in result.inventory]
     if result.backpack:
-        context["backpack"] = [(base64.b64encode(element.item_data.image).decode("utf-8"), element.name) for element in
-                               result.backpack]
+        context["backpack"] = [
+            (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, element.item_data.modifier)
+            for element in result.backpack]
     return render_template("profile.html", **context)
 
 
@@ -117,49 +118,35 @@ def change_statistic(profile_data, modifier, plus=True):
     Takes in profile_data(data from sql of the profile), modifier(statistics that are suppose to be changed and their
     values) and plus= parameter to determine if statistics are being added or removed. Makes requested changes in
     database.
-    :return:
     """
     session = session_creator()
-    dictionary = {"attack_dmg": profile_data.attack_dmg,
-                  "chance_to_crit": profile_data.chance_to_crit,
-                  "max_hp": profile_data.max_hp,
-                  "max_mana": profile_data.max_mana,
-                  "max_stamina": profile_data.max_stamina,
-                  "armor": profile_data.armor,
-                  "chance_to_steal": profile_data.chance_to_steal}
-    multi_stat = {"max_hp": ["hp", profile_data.hp],
-                "max_mana": ["mana", profile_data.mana],
-                "max_stamina": ["stamina", profile_data.stamina]}
+    dictionary = {"attack_dmg": [("attack_dmg", profile_data.attack_dmg)],
+                  "chance_to_crit": [("chance_to_crit", profile_data.chance_to_crit)],
+                  "max_hp": [("max_hp", profile_data.max_hp), ("hp", profile_data.hp)],
+                  "max_mana": [("max_mana", profile_data.max_mana), ("mana", profile_data.mana)],
+                  "max_stamina": [("max_stamina", profile_data.max_stamina), ("stamina", profile_data.stamina)],
+                  "armor": [("armor", profile_data.armor)],
+                  "chance_to_steal": [("chance_to_steal", profile_data.chance_to_steal)],
+                  "hp": [("hp", profile_data.hp)],
+                  "mana": [("mana", profile_data.mana)]}
+    plus_dict = {True: "+",
+                 False: "-"}
     split_modifier = modifier.split(";")
     for data in split_modifier:
         element_component = data.split(" ")
-        if element_component[1] in multi_stat:
-            if plus:
-                session.query(Profile) \
-                    .filter(Profile.id == global_id) \
-                    .update({multi_stat[element_component[1]][0]: multi_stat[element_component[1]][1] + int(element_component[0])})
-            else:
-                session.query(Profile) \
-                    .filter(Profile.id == global_id) \
-                    .update({multi_stat[element_component[1]][0]: multi_stat[element_component[1]][1] - int(element_component[0])})
-        if "." in element_component[0]:
-            if plus:
-                session.query(Profile) \
+        for item in dictionary[element_component[1]]:
+            if "." in element_component[0]:
+                exec("session.query(Profile) \
                         .filter(Profile.id == global_id) \
-                        .update({element_component[1]: dictionary[element_component[1]] + float(element_component[0])})
+                        .update({item[0]: item[1]" + plus_dict[plus] + "float(element_component[0])})")
             else:
-                session.query(Profile) \
-                    .filter(Profile.id == global_id) \
-                    .update({element_component[1]: dictionary[element_component[1]] - float(element_component[0])})
-        else:
-            if plus:
-                session.query(Profile) \
-                    .filter(Profile.id == global_id) \
-                    .update({element_component[1]: dictionary[element_component[1]] + int(element_component[0])})
-            else:
-                session.query(Profile) \
-                    .filter(Profile.id == global_id) \
-                    .update({element_component[1]: dictionary[element_component[1]] - int(element_component[0])})
+                exec("session.query(Profile) \
+                        .filter(Profile.id == global_id) \
+                        .update({item[0]: item[1]" + plus_dict[plus] + "int(element_component[0])})")
+        if profile_data.hp > profile_data.max_hp:
+            profile_data.hp = profile_data.max_hp
+        if profile_data.mana > profile_data.max_mana:
+            profile_data.mana = profile_data.max_mana
     session.commit()
 
 
@@ -173,10 +160,16 @@ def shop(text):
     """
     context = {}
     session = session_creator()
-    result = session.query(AllItemsInventory) \
-        .filter(AllItemsInventory.type == text)\
-        .order_by(asc(AllItemsInventory.price))\
-        .all()
+    if text == "Consumable":
+        result = session.query(AllItemsBackpack) \
+            .filter(AllItemsBackpack.type == text) \
+            .order_by(asc(AllItemsBackpack.price)) \
+            .all()
+    else:
+        result = session.query(AllItemsInventory) \
+            .filter(AllItemsInventory.type == text)\
+            .order_by(asc(AllItemsInventory.price))\
+            .all()
     global global_id
     profile_result = session.query(Profile)\
         .filter(Profile.id == global_id)\
@@ -189,33 +182,48 @@ def shop(text):
     if new_item_name is None:
         pass
     else:
-        #zwraca wartości wybranego przedmiotu
-        item_result = session.query(AllItemsInventory)\
-            .filter(AllItemsInventory.name == new_item_name)\
-            .one()
-        new_item_price = item_result.price
-        new_item_type = item_result.type
-        new_item_modifier = item_result.modifier
+        if new_item_name in [element.name for element in result]:
+            item_result = session.query(AllItemsBackpack) \
+                .filter(AllItemsBackpack.name == new_item_name) \
+                .one()
+            new_item_price = item_result.price
 
-        #modyfikuje posiadaną kasę i statystyki(usuwa stare statystyki i dodaje nowe)
-        budget_result = profile_result.money - new_item_price
-        if budget_result < 0:
-            context["error"] = "Brak środków"
-        else:
-            if new_item_type in [element.item_data.type for element in profile_result.inventory]:
-                for element in profile_result.inventory:
-                    if new_item_type == element.item_data.type:
-                        profile_result.money += (element.item_data.price * 0.75)
-                        change_statistic(profile_result, element.item_data.modifier, plus=False)
-                        element.name = new_item_name
-                        session.commit()
-                        change_statistic(profile_result, element.item_data.modifier)
+            # modyfikuje posiadaną kasę i statystyki(usuwa stare statystyki i dodaje nowe)
+            budget_result = profile_result.money - new_item_price
+            if budget_result < 0:
+                context["error"] = "Brak środków"
             else:
-                item = InventoryItem(hero_id=global_id, name=new_item_name)
-                session.add(item)
-                change_statistic(profile_result, new_item_modifier)
-            profile_result.money -= new_item_price
-            session.commit()
+                if profile_result.capacity > 1:
+                    item = BackpackItem(hero_id=global_id, name=new_item_name)
+                    session.add(item)
+        else:
+            #zwraca wartości wybranego przedmiotu
+            item_result = session.query(AllItemsInventory)\
+                .filter(AllItemsInventory.name == new_item_name)\
+                .one()
+            new_item_price = item_result.price
+            new_item_type = item_result.type
+            new_item_modifier = item_result.modifier
+
+            #modyfikuje posiadaną kasę i statystyki(usuwa stare statystyki i dodaje nowe)
+            budget_result = profile_result.money - new_item_price
+            if budget_result < 0:
+                context["error"] = "Brak środków"
+            else:
+                if new_item_type in [element.item_data.type for element in profile_result.inventory]:
+                    for element in profile_result.inventory:
+                        if new_item_type == element.item_data.type:
+                            profile_result.money += (element.item_data.price * 0.75)
+                            change_statistic(profile_result, element.item_data.modifier, plus=False)
+                            element.name = new_item_name
+                            session.commit()
+                            change_statistic(profile_result, element.item_data.modifier)
+                else:
+                    item = InventoryItem(hero_id=global_id, name=new_item_name)
+                    session.add(item)
+                    change_statistic(profile_result, new_item_modifier)
+        profile_result.money -= new_item_price
+        session.commit()
     context["money"] = profile_result.money
     return render_template("shop.html", **context)
 
@@ -226,3 +234,4 @@ if __name__ == "__main__":
 # TODO: sklep dokończyć,
 # TODO: questy i walka(mapa)
 # TODO: backpack
+# TODO: wielkość potionów w sklepie
