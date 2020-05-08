@@ -1,0 +1,1 @@
+secret_key = "moja_aplikacja_2020"

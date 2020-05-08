@@ -1,18 +1,32 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, url_for
+from sqlalchemy.orm.exc import NoResultFound
 from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem
 from session import session_creator
 import base64
 from sqlalchemy import asc
 import logging
+from key import secret_key
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.secret_key = secret_key
 
 formatter = logging.Formatter("%(asctime)s- [%(levelname)s]: %(message)s")
 handler = logging.FileHandler('loggs.txt', encoding="utf-8")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-global_id = None
+
+def login_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if session:
+            return view(*args, **kwargs)
+        else:
+            return redirect('/')
+
+    return wrapped_view
 
 
 @app.route("/")
@@ -22,8 +36,6 @@ def main_menu():
     Main page that includes login area. If user fails to log in there will be logg created in "loggs.txt"
     :return:
     """
-    global global_id
-    global_id = None
     context = {}
     if request.path == "/error":
         ip = request.remote_addr
@@ -38,22 +50,23 @@ def create_new_champion():
     Allows to create new character with passed data.
     :return:
     """
-    session = session_creator()
+    session_sql = session_creator()
     context = {}
     login = request.form.get("login")
     password = request.form.get("password")
     repeated_password = request.form.get("repeat_password")
     name = request.form.get("hero_name")
     if password and login and name:
-        logins_names_list = session.query(Profile).all()
+        logins_names_list = session_sql.query(Profile).all()
         if login not in [element.login for element in logins_names_list] and name not in [element.login for element in logins_names_list]:
             if password == repeated_password:
+                hashed_password = generate_password_hash(password)
                 if any(substring in name for substring in ["Lukasz", "lukasz", "Łukasz", "łukasz"]):
-                    new_profile = Profile(name=name, login=login, password=password, attack_dmg=15, money=150)
+                    new_profile = Profile(name=name, login=login, password=hashed_password, attack_dmg=15, money=150)
                 else:
-                    new_profile = Profile(name=name, login=login, password=password)
-                session.add(new_profile)
-                session.commit()
+                    new_profile = Profile(name=name, login=login, password=hashed_password)
+                session_sql.add(new_profile)
+                session_sql.commit()
                 context["message"] = "Poprawnie dodano do armi!"
             elif password != repeated_password:
                 context["error"] = "Podane hasła nie są identyczne"
@@ -64,28 +77,44 @@ def create_new_champion():
     return render_template("create_hero.html", **context)
 
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+@app.route("/check_login", methods=["POST"])
+def check_login():
+    session_sql = session_creator()
+    login = request.form.get("login")
+    password = request.form.get("password")
+    try:
+        profile_result = session_sql.query(Profile) \
+            .filter(Profile.login == login) \
+            .one()
+    except NoResultFound:
+        return redirect("/error")
+    if profile_result:
+        hashed_password = profile_result.password
+        if check_password_hash(hashed_password, password):
+            session["user_id"] = profile_result.id
+            return redirect(url_for("profile"))
+        else:
+            return redirect(url_for("error"))
+
+
 @app.route("/profile", methods=["get", "post"])
+@login_required
 def profile():
     """
     Endpoint "/profile" operates on 2 methods(post, get): post is provided by login page(index.html) and get is provided
     by menu shortcut(menu.html). When calling this endpoint from shortcut menu, id is taken from global
     variable set after logging in to receive most updated data to populate web page. Displays all characters data.
     """
-    global global_id
-    session = session_creator()
-    if request.method == "POST":
-        login = request.form.get("login")
-        password = request.form.get("password")
-        try:
-            id_result = session.query(Profile) \
-                .filter(Profile.login == login) \
-                .filter(Profile.password == password) \
-                .one()
-        except Exception:
-            return redirect("/error")
-        global_id = id_result.id
-    result = session.query(Profile) \
-        .filter(Profile.id == global_id) \
+    user_id = session.get("user_id")
+    session_sql = session_creator()
+    result = session_sql.query(Profile) \
+        .filter(Profile.id == user_id) \
         .one()
     context = {"name": result.name,
                "level": result.level,
@@ -119,7 +148,8 @@ def change_statistic(profile_data, modifier, plus=True):
     values) and plus= parameter to determine if statistics are being added or removed. Makes requested changes in
     database.
     """
-    session = session_creator()
+    user_id = session.get("user_id")
+    session_sql = session_creator()
     dictionary = {"attack_dmg": [("attack_dmg", profile_data.attack_dmg)],
                   "chance_to_crit": [("chance_to_crit", profile_data.chance_to_crit)],
                   "max_hp": [("max_hp", profile_data.max_hp), ("hp", profile_data.hp)],
@@ -129,28 +159,34 @@ def change_statistic(profile_data, modifier, plus=True):
                   "chance_to_steal": [("chance_to_steal", profile_data.chance_to_steal)],
                   "hp": [("hp", profile_data.hp)],
                   "mana": [("mana", profile_data.mana)]}
-    plus_dict = {True: "+",
-                 False: "-"}
     split_modifier = modifier.split(";")
     for data in split_modifier:
         element_component = data.split(" ")
         for item in dictionary[element_component[1]]:
-            if "." in element_component[0]:
-                exec("session.query(Profile) \
-                        .filter(Profile.id == global_id) \
-                        .update({item[0]: item[1]" + plus_dict[plus] + "float(element_component[0])})")
+            # dodac nazwy statystyk, stworzyć mniejsze funkcje
+            if item[0] in ["chance_to_crit", "chance_to_steal"]:
+                if plus:
+                    my_dict = {item[0]: item[1] + float(element_component[0])}
+                else:
+                    my_dict = {item[0]: item[1] - float(element_component[0])}
             else:
-                exec("session.query(Profile) \
-                        .filter(Profile.id == global_id) \
-                        .update({item[0]: item[1]" + plus_dict[plus] + "int(element_component[0])})")
+                if plus:
+                    my_dict = {item[0]: item[1] + int(element_component[0])}
+                else:
+                    my_dict = {item[0]: item[1] - int(element_component[0])}
+            session_sql.query(Profile)\
+                .filter(Profile.id == user_id)\
+                .update(my_dict)
+
         if profile_data.hp > profile_data.max_hp:
             profile_data.hp = profile_data.max_hp
         if profile_data.mana > profile_data.max_mana:
             profile_data.mana = profile_data.max_mana
-    session.commit()
+    session_sql.commit()
 
 
 @app.route("/shop/<text>", methods=["get", "post"])
+@login_required
 def shop(text):
     """
     Takes in text which determines what kind of items are being displayed(default showing 'Weapon'). Allows to add new
@@ -159,31 +195,35 @@ def shop(text):
     :return:
     """
     context = {}
-    session = session_creator()
+    session_sql = session_creator()
+    user_id = session.get("user_id")
     if text == "Consumable":
-        result = session.query(AllItemsBackpack) \
+        result = session_sql.query(AllItemsBackpack) \
             .filter(AllItemsBackpack.type == text) \
             .order_by(asc(AllItemsBackpack.price)) \
             .all()
     else:
-        result = session.query(AllItemsInventory) \
+        result = session_sql.query(AllItemsInventory) \
             .filter(AllItemsInventory.type == text)\
             .order_by(asc(AllItemsInventory.price))\
             .all()
-    global global_id
-    profile_result = session.query(Profile)\
-        .filter(Profile.id == global_id)\
+    profile_result = session_sql.query(Profile)\
+        .filter(Profile.id == user_id)\
         .one()
     context["inventory"] = [
-            (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price) for
-            element in result]
+            (base64.b64encode(element.image).decode("utf-8"), element.name, element.modifier, element.price,
+             element.type) for element in result]
 
-    new_item_name = request.form.get("item")
-    if new_item_name is None:
-        pass
-    else:
-        if new_item_name in [element.name for element in result]:
-            item_result = session.query(AllItemsBackpack) \
+    # print(request.form.get("item"), type(request.form.get("item")))
+    if request.form.get("item"):
+        new_item = request.form.get("item")
+        item_details = new_item.split(",")
+        new_item_name = item_details[0]
+        new_item_type = item_details[1]
+        print(f"type: {new_item_type}, name: {new_item_name}")
+
+        if new_item_type == "Consumable":
+            item_result = session_sql.query(AllItemsBackpack) \
                 .filter(AllItemsBackpack.name == new_item_name) \
                 .one()
             new_item_price = item_result.price
@@ -194,11 +234,11 @@ def shop(text):
                 context["error"] = "Brak środków"
             else:
                 if profile_result.capacity > 1:
-                    item = BackpackItem(hero_id=global_id, name=new_item_name)
-                    session.add(item)
+                    item = BackpackItem(hero_id=user_id, name=new_item_name)
+                    session_sql.add(item)
         else:
             #zwraca wartości wybranego przedmiotu
-            item_result = session.query(AllItemsInventory)\
+            item_result = session_sql.query(AllItemsInventory)\
                 .filter(AllItemsInventory.name == new_item_name)\
                 .one()
             new_item_price = item_result.price
@@ -213,17 +253,18 @@ def shop(text):
                 if new_item_type in [element.item_data.type for element in profile_result.inventory]:
                     for element in profile_result.inventory:
                         if new_item_type == element.item_data.type:
+                            # TODO: dodać funckję replace_item
                             profile_result.money += (element.item_data.price * 0.75)
                             change_statistic(profile_result, element.item_data.modifier, plus=False)
                             element.name = new_item_name
-                            session.commit()
+                            session_sql.commit()
                             change_statistic(profile_result, element.item_data.modifier)
                 else:
-                    item = InventoryItem(hero_id=global_id, name=new_item_name)
-                    session.add(item)
+                    item = InventoryItem(hero_id=user_id, name=new_item_name)
+                    session_sql.add(item)
                     change_statistic(profile_result, new_item_modifier)
         profile_result.money -= new_item_price
-        session.commit()
+        session_sql.commit()
     context["money"] = profile_result.money
     return render_template("shop.html", **context)
 

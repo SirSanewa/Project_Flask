@@ -36,5 +36,6 @@ for file in os.listdir(directory):
         price = item_elements[2]
         item_type = "Consumable"
         items.append(AllItemsBackpack(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
+# TODO: splity podzielić modifiery na kolumny statystyk
 session.bulk_save_objects(items)
 session.commit()
