@@ -31,12 +31,18 @@ li {
     color: black;
     height: 128px;
     }
-img {
+img.item {
     height: 120px;
     width: 60px;
     float: left;
     text-align: left;
-    top: 0px;
+    }
+img.consumable {
+    height: auto;
+    width: auto;
+    float: left;
+    text-align: left;
+    margin-top: 30px;
     }
 div.description_area {
     height: 100%;

@@ -48,7 +48,11 @@
             {% for item in inventory %}
             <ul>
                 <li>
+                    {% if item[3] == 'Consumable' %}
+                    <img class="consumable" src="data:;base64,{{ item[0] }}">
+                    {% else %}
                     <img class="item" src="data:;base64,{{ item[0] }}">
+                    {% endif %}
                     <div class="description_area">
                         <div class="item_description">
                             Nazwa: {{ item[1] | replace('_', ' ')}}<br>

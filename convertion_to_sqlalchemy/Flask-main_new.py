@@ -315,5 +315,4 @@ if __name__ == "__main__":
 # TODO: sklep dokończyć,
 # TODO: questy i walka(mapa)
 # TODO: backpack
-# TODO: wielkość potionów w sklepie
 # TODO: sprobować porobić testy
