@@ -7,9 +7,7 @@ engine = create_engine("sqlite:///database2.db")
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-items = [
-    Profile(name="test", login="test", password="test"),
-]
+items = []
 
 directory = "static/items_inventory"
 for file in os.listdir(directory):
@@ -19,11 +17,23 @@ for file in os.listdir(directory):
         item_elements = file_name[0].split(",")
         item_name = item_elements[0]
         modifier = item_elements[1]
+        split_modifier = modifier.split(";")
+        dictionary = {"attack_dmg": None, "chance_to_crit": None, "max_hp": None, "max_mana": None,
+                      "max_stamina": None, "armor": None, "chance_to_steal": None}
+        for statistic in split_modifier:
+            stat_component = statistic.split(" ")
+            value = stat_component[0]
+            stat_name = stat_component[1]
+            dictionary[stat_name] = value
         price = item_elements[2]
         item_type = item_name.split("_")[1]
         if item_type in ["Axe", "Mace", "Sword", "Dagger"]:
             item_type = "Weapon"
-        items.append(AllItemsInventory(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
+        items.append(AllItemsInventory(**dictionary,
+                                       image=byte_file,
+                                       name=item_name,
+                                       price=price,
+                                       type=item_type))
 
 directory = "static/items_backpack"
 for file in os.listdir(directory):
@@ -33,9 +43,16 @@ for file in os.listdir(directory):
         item_elements = file_name[0].split(",")
         item_name = item_elements[0]
         modifier = item_elements[1]
+        split_modifier = modifier.split(";")
+        dictionary = {"attack_dmg": None, "chance_to_crit": None, "max_hp": None, "max_mana": None,
+                      "max_stamina": None, "armor": None, "chance_to_steal": None, "hp": None, "mana": None}
+        for statistic in split_modifier:
+            stat_component = statistic.split(" ")
+            value = stat_component[0]
+            stat_name = stat_component[1]
+            dictionary[stat_name] = value
         price = item_elements[2]
         item_type = "Consumable"
-        items.append(AllItemsBackpack(image=byte_file, name=item_name, modifier=modifier, price=price, type=item_type))
-# TODO: splity podzielić modifiery na kolumny statystyk
+        items.append(AllItemsBackpack(**dictionary, image=byte_file, name=item_name, price=price, type=item_type))
 session.bulk_save_objects(items)
 session.commit()

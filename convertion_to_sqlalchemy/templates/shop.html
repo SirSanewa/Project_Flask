@@ -54,15 +54,15 @@
                             Nazwa: {{ item[1] | replace('_', ' ')}}<br>
                         </div>
                         <div class="item_description">
-                            Bonus: {{ item[2] | replace(';', ', ') | replace('_', ' ')}}<br>
+                            Bonus: {{ item[2] | replace('_', ' ')}}<br>
                         </div>
                         <div class="item_description">
-                            Cena: {{ item[3] }}$<br>
+                            Cena: {{ item[4] }}$<br>
                         </div>
                     </div>
                     <div class="button">
                         <form method="post">
-                            <button name="item" value="{{ item[1] }},{{ item[4] }}" type="submit">kup</button>
+                            <button name="item" value="{{ item[1] }},{{ item[3] }}" type="submit">kup</button>
                         </form>
                     </div>
                 </li>

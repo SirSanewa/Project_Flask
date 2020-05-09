@@ -11,7 +11,15 @@ class AllItemsInventory(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
-    modifier = Column(String(255))
+
+    attack_dmg = Column(Integer)
+    chance_to_crit = Column(Float)
+    max_hp = Column(Integer)
+    max_mana = Column(Integer)
+    max_stamina = Column(Integer)
+    armor = Column(Integer)
+    chance_to_steal = Column(Float)
+
     price = Column(Integer)
     type = Column(String(255))
 
@@ -22,7 +30,17 @@ class AllItemsBackpack(Base):
     item_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     name = Column(String(255))
-    modifier = Column(String(255))
+
+    attack_dmg = Column(Integer)
+    chance_to_crit = Column(Float)
+    max_hp = Column(Integer)
+    max_mana = Column(Integer)
+    max_stamina = Column(Integer)
+    armor = Column(Integer)
+    chance_to_steal = Column(Float)
+    hp = Column(Integer)
+    mana = Column(Integer)
+
     price = Column(Integer)
     type = Column(String(255))
 
