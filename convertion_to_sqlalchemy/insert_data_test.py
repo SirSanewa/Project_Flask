@@ -1,11 +1,8 @@
-from models_backpack_inventory_profile import BackpackItem, InventoryItem, AllItemsInventory, AllItemsBackpack, Profile
-from sqlalchemy import create_engine
-from sqlalchemy.orm.session import sessionmaker
+from models_backpack_inventory_profile import AllItemsInventory, AllItemsBackpack
 import os
+from session import session_creator
 
-engine = create_engine("sqlite:///database2.db")
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+session = session_creator()
 
 items = []
 

@@ -1,6 +1,7 @@
+from datetime import datetime
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, Quests
 from session import session_creator
 import base64
 from sqlalchemy import asc, inspect
@@ -158,6 +159,16 @@ def add_inventory_item(session_sql, new_item_name, profile_result, user_id):
     session_sql.commit()
 
 
+def create_quests_for_new_character(login, hashed_password, session_sql):
+    profile = session_sql.query(Profile) \
+        .filter(Profile.login == login) \
+        .filter(Profile.password == hashed_password) \
+        .one()
+    quests = Quests(hero_id=profile.id)
+    session_sql.add(quests)
+    session_sql.commit()
+
+
 @app.route("/")
 @app.route("/error")
 def main_menu():
@@ -186,8 +197,8 @@ def create_new_champion():
     repeated_password = request.form.get("repeat_password")
     name = request.form.get("hero_name")
     if password and login and name:
-        logins_names_list = session_sql.query(Profile).all()
-        if login not in [element.login for element in logins_names_list] and name not in [element.login for element in logins_names_list]:
+        logins_and_names_list = session_sql.query(Profile).all()
+        if login not in [element.login for element in logins_and_names_list] and name not in [element.login for element in logins_and_names_list]:
             if password == repeated_password:
                 hashed_password = generate_password_hash(password)
                 if any(substring in name for substring in ["Lukasz", "lukasz", "Łukasz", "łukasz"]):
@@ -196,6 +207,7 @@ def create_new_champion():
                     new_profile = Profile(name=name, login=login, password=hashed_password)
                 session_sql.add(new_profile)
                 session_sql.commit()
+                create_quests_for_new_character(login, hashed_password, session_sql)
                 context["message"] = "Poprawnie dodano do armi!"
             elif password != repeated_password:
                 context["error"] = "Podane hasła nie są identyczne"
@@ -248,6 +260,7 @@ def profile():
     context = {"name": result.name,
                "level": result.level,
                "exp": result.exp,
+               "max_lvl_exp": int(result.level * 1.5 * 100),
                "hp": result.hp,
                "max_hp": result.max_hp,
                "mana": result.mana,
@@ -309,10 +322,75 @@ def shop(text):
     return render_template("shop.html", **context)
 
 
+@app.route("/quests")
+@login_required
+def quests():
+    user_id = session.get("user_id")
+    session_sql = session_creator()
+    profile = session_sql.query(Profile) \
+        .filter(Profile.id == user_id) \
+        .one()
+    time_now = datetime.now()
+    quest_time = datetime(2020, 5, 17, 23, 59, 59)
+    context = {"time": quest_time}
+    if time_now < quest_time:
+        context["quest_1"] = quest_details_buy_simple_axe(session_sql, profile)
+        context["quest_2"] = quest_details_buy_shield(session_sql, profile)
+    return render_template("quests.html", **context)
+
+
+def quest_details_buy_shield(session_sql, profile):
+    quest_item_type = "Shield"
+    money_reward = 25
+    exp_reward = 100
+    quest_details = {"reward": f"${money_reward}, {exp_reward}exp"}
+    if not profile.quests.quest_2:
+        if quest_item_type in [item.item_data.type for item in profile.inventory]:
+            profile.quests.quest_2 = True
+            profile.money += money_reward
+            update_exp_and_lvl(exp_reward, profile)
+            session_sql.commit()
+            quest_details["completed"] = True
+        else:
+            quest_details["completed"] = False
+    else:
+        quest_details["completed"] = True
+    return quest_details
+
+
+def update_exp_and_lvl(exp_reward, profile):
+    profile.exp += exp_reward
+    max_exp = int(profile.level * 1.5 * 100)
+    if profile.exp > max_exp:
+        profile.exp -= max_exp
+        profile.level += 1
+
+
+def quest_details_buy_simple_axe(session_sql, profile):
+    quest_item = "Simple_Axe"
+    money_reward = 25
+    exp_reward = 100
+    item = session_sql.query(AllItemsInventory) \
+        .filter(AllItemsInventory.name == quest_item) \
+        .one()
+    quest_details = {"image": base64.b64encode(item.image).decode("utf-8"),
+                     "name": item.name,
+                     "reward": f"${money_reward}, {exp_reward}exp"}
+    if not profile.quests.quest_1:
+        if quest_item in [item.name for item in profile.inventory]:
+            profile.quests.quest_1 = True
+            profile.money += money_reward
+            profile.exp += exp_reward
+            session_sql.commit()
+            quest_details["completed"] = True
+    else:
+        quest_details["completed"] = True
+    return quest_details
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: sklep dokończyć,
 # TODO: questy i walka(mapa)
 # TODO: backpack
 # TODO: sprobować porobić testy

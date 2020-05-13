@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Float, ForeignKey, BLOB, LargeBinary
+from sqlalchemy import create_engine, Column, String, Integer, Float, ForeignKey, Boolean, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -65,10 +65,19 @@ class InventoryItem(Base):
     item_data = relationship(AllItemsInventory)
 
 
+class Quests(Base):
+    __tablename__ = "quests"
+
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    hero_id = Column(Integer, nullable=False)
+    quest_1 = Column(Boolean, default=False)
+    quest_2 = Column(Boolean, default=False)
+
+
 class Profile(Base):
     __tablename__ = "profile"
 
-    id = Column(Integer, ForeignKey("inventory.hero_id"), ForeignKey("backpack.hero_id"), primary_key=True, autoincrement=True)
+    id = Column(Integer, ForeignKey("inventory.hero_id"), ForeignKey("backpack.hero_id"), ForeignKey("quests.hero_id"), primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False, unique=True)
     login = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
@@ -89,8 +98,9 @@ class Profile(Base):
 
     inventory = relationship(InventoryItem, viewonly=True, uselist=True)
     backpack = relationship(BackpackItem, viewonly=True, uselist=True)
+    quests = relationship(Quests, viewonly=True)
 
 
 if __name__ == "__main__":
-    engine = create_engine("sqlite:///convertion_to_sqlalchemy/database2.db")
+    engine = create_engine("sqlite:///database.db")
     Base.metadata.create_all(engine)

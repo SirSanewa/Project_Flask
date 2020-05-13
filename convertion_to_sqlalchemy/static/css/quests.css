@@ -1,0 +1,63 @@
+body {
+    background: url("/static/shop_background.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+div.quests {
+    margin-top: 50px;
+    width: 100%;
+    float: left;
+    }
+div.quest {
+    width: 90%;
+    margin: 10px 5% 10px 5%;
+    border-radius: 25px;
+    border: 1px solid black;
+    background-color: RGBA(156, 152, 142, 0.6);
+    float: left;
+}
+p {
+    margin: 10px 10px 10px 10px;
+    content-align: middle;
+    padding:0px;
+}
+img {
+    position: relative;
+    top: 15px;
+    width: 20px;
+    height: 40px;
+}
+a.link:link, a.link:visited {
+    color: white;
+    text-decoration: none;
+    }
+a.link:hover, a.link:active {
+    boarder-left: solid black 1px;
+    color: #bd4656;
+    text-decoration: none;
+    }
+p.completed {
+    color: RGBA(24, 61, 21);
+    }
+div.quest_description {
+    float: left;
+    width: 70%;
+    height: 60px;
+
+    text-align: center;
+    }
+div.quest_status {
+    margin: 10px 10px 10px 200px;
+    float: left;
+    height: auto;
+    width: 10%;
+    text-align: center;
+    }
+div.quests_info {
+    width: 100%;
+    float: left;
+    margin-top: -20px;
+    }

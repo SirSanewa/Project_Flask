@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Game - Quests</title>
+    <link rel="shortcut icon" href="/static/icon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/quests.css">
+<!--    <meta http-equiv="refresh" content="5">-->
+</head>
+<body>
+    {% extends "menu.html" %}
+    {% block page_content %}
+    <div class="quests">
+        <div class="quest">
+            <p><b>Tygodniowe Questy (do: {{ time }})</b></p><br>
+            {% if quest_1 %}
+            <div class="quests_info">
+                <div class="quest_description">
+                    <p style="margin-top: -5px;">Kup {{ quest_1.name | replace('_',' ') }}:
+                    <a href="/shop/Weapon"><img class="quest_item" src="data:;base64,{{ quest_1.image }}"></a>.
+                    Nagroda: {{ quest_1.reward }}.</p>
+                </div>
+                <div class="quest_status">
+                    {% if quest_1.completed %}
+                    <p class="completed">
+                        Wykonano!
+                    </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            </div>
+            {% if quest_2 %}
+            <div class="quests_info">
+                <div class="quest_description">
+                    <p style="margin-top: 20px;">Kup przedmiot typu
+                    <a class ="link" href="/shop/Shield">Tarcza</a>.
+                    Nagroda: {{ quest_2.reward }}.</p>
+                </div>
+                <div class="quest_status">
+                    {% if quest_2.completed %}
+                        <p class="completed">
+                        Wykonano!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>
