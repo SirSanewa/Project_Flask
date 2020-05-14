@@ -407,6 +407,5 @@ def quest_details_buy_simple_axe(session_sql, profile):
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: questy i walka(mapa)
-# TODO: backpack
+# TODO: walka(mapa)
 # TODO: sprobować porobić testy
