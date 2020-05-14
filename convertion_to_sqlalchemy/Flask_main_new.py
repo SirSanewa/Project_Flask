@@ -409,3 +409,4 @@ if __name__ == "__main__":
 
 # TODO: walka(mapa)
 # TODO: sprobować porobić testy
+# TODO: questy początkujące, questy tygodnidowe

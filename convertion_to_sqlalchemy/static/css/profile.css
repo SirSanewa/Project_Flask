@@ -62,7 +62,7 @@ div.backpack {
     margin-top: -15px;
     padding: 0;
     width: 95%;
-    height: 100%;
+    height: 95%;
     }
 div.buttons {
     width: 50%;
@@ -83,6 +83,28 @@ div.amount {
 p.backpack_title {
     text-align: center;
     }
-span {
+span.button_text {
     margin-left: -9.5px;
+    }
+progress {
+    margin-left: 10px;
+    background-color: white;
+    }
+progress.hp::-moz-progress-bar {
+    background: RGBA(125, 4, 4);
+    }
+progress.mana::-moz-progress-bar {
+    background: RGBA(1, 37, 135);
+    }
+progress.stamina::-moz-progress-bar {
+    background: RGBA(181, 175, 7);
+    }
+div.progress {
+    height: 10px;
+    float: right;
+    margin-top: 2px;
+    }
+span.bar_label {
+    position: absolute;
+    margin-left: -110px;
     }

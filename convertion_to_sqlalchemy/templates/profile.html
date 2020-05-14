@@ -10,7 +10,7 @@
     {% extends "menu.html" %}
     {% block page_content %}
     <div class="main">
-    <table class="regular" height="400px">
+    <table class="regular" height="390px">
         <tr>
             <td class="hero_description"  height="45" colspan="3">
                 <a>Imię: {{ name }}, level: {{ level }}, exp: {{ exp }}/{{ max_lvl_exp }} i {{money}}$</a>
@@ -21,13 +21,13 @@
                 Statystyki:<br><br>
                 <ul class="statistic_list">
                     <li class="statistic_list">
-                        Punkty życia: {{ hp }}/{{ max_hp }}
+                        Punkty życia: <div class="progress"><progress class="hp" max="{{ max_hp }}" value="{{ hp }}" title="{{ hp }}/{{ max_hp }}"></progress><span class="bar_label">{{ hp }}/{{ max_hp }}</span></div>
                     </li>
                     <li class="statistic_list">
-                        Mana: {{ mana }}/{{ max_mana }}
+                        Mana: <div class="progress"><progress class="mana" max="{{ max_mana }}" value="{{ mana }}" title="{{ mana }}/{{ max_mana }}"></progress><span class="bar_label">{{ mana }}/{{ max_mana }}</span></div>
                     </li>
                     <li class="statistic_list">
-                        Energia: {{ stamina }}/{{ max_stamina }}
+                        Energia: <div class="progress"><progress class="stamina" max="{{ max_stamina }}" value="{{ stamina }}" title="{{ stamina }}/{{ max_stamina }}"></progress><span class="bar_label">{{ stamina }}/{{ max_stamina }}</span></div>
                     </li>
                     <li class="statistic_list">
                         Pancerz: {{ armor }}
@@ -117,7 +117,7 @@
                             </div>
                             <form>
                                 <button class="backpack_button">użyj</button>
-                                <button class="backpack_button"><span>sprzedaj</span></button>
+                                <button class="backpack_button"><span class="button_text">sprzedaj</span></button>
                             </form>
                         </div>
                     </div>
