@@ -22,7 +22,7 @@ table.regular td.equipment {
     width: 30%;
     }
 table.regular td.backpack {
-    width: 45%;
+    width: 40%;
     }
 table.inventory td {
     width: 33%;
@@ -42,4 +42,47 @@ img:hover {
     }
 td.hero_description a{
     margin-left: 30px;
+    }
+img.backpack {
+    margin-top: 20px;
+    display: block;
+    opacity: 100%;
+    }
+div.backpack_item {
+    border-radius: 25px;
+    float: left;
+    width: 28%;
+    height: 20%;
+    border: 1px solid black;
+    margin: 8px 10px 8px 10px;
+    padding: 0;
+    }
+div.backpack {
+    margin-left: 15px;
+    margin-top: -15px;
+    padding: 0;
+    width: 95%;
+    height: 100%;
+    }
+div.buttons {
+    width: 50%;
+    margin-left: 45%;
+    margin-top: -70px;
+    }
+button.backpack_button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 0;
+    padding-right: 5px;
+    text-align: center;
+    }
+div.amount {
+    text-align: center;
+    font-size: small;
+    }
+p.backpack_title {
+    text-align: center;
+    }
+span {
+    margin-left: -9.5px;
     }

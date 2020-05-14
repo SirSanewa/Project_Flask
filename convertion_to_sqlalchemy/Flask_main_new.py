@@ -54,6 +54,15 @@ def create_inventory_for_profile(database):
     return item_list
 
 
+def create_backpack_for_profile(database):
+    item_list = []
+    for element in database:
+        dictionary = object_as_dict(element.item_data)
+        item_modifier = create_modifier(dictionary)
+        item_list.append((base64.b64encode(element.item_data.image).decode("utf-8"), element.name, item_modifier, element.amount))
+    return item_list
+
+
 def create_inventory_for_shop(database):
     item_list = []
     for element in database:
@@ -117,14 +126,21 @@ def add_consumable(session_sql, profile_result, user_id, new_item_name):
     if budget_result < 0:
         return "Brak środków"
     else:
-        if profile_result.capacity > 0:
-            item = BackpackItem(hero_id=user_id, name=new_item_name)
-            profile_result.capacity -= 1
-            profile_result.money -= new_item_price
-            session_sql.add(item)
-            session_sql.commit()
+        if new_item_name in [item.name for item in profile_result.backpack]:
+            current_item = session_sql.query(BackpackItem)\
+                .filter(BackpackItem.name == new_item_name)\
+                .filter(BackpackItem.hero_id == user_id)\
+                .one()
+            current_item.amount += 1
         else:
-            return "Nie masz wystarczająco miejsca w plecaku"
+            if profile_result.capacity > 0:
+                item = BackpackItem(hero_id=user_id, name=new_item_name, amount=1)
+                profile_result.capacity -= 1
+                session_sql.add(item)
+            else:
+                return "Nie masz wystarczająco miejsca w plecaku"
+    profile_result.money -= new_item_price
+    session_sql.commit()
 
 
 def replace_item(profile_result, element, new_item_name, session_sql):
@@ -276,7 +292,7 @@ def profile():
     if result.inventory:
         context["inventory"] = create_inventory_for_profile(result.inventory)
     if result.backpack:
-        context["backpack"] = create_inventory_for_profile(result.backpack)
+        context["backpack"] = create_backpack_for_profile(result.backpack)
     return render_template("profile.html", **context)
 
 
@@ -342,7 +358,7 @@ def quests():
 def quest_details_buy_shield(session_sql, profile):
     quest_item_type = "Shield"
     money_reward = 25
-    exp_reward = 100
+    exp_reward = 50
     quest_details = {"reward": f"${money_reward}, {exp_reward}exp"}
     if not profile.quests.quest_2:
         if quest_item_type in [item.item_data.type for item in profile.inventory]:
@@ -369,7 +385,7 @@ def update_exp_and_lvl(exp_reward, profile):
 def quest_details_buy_simple_axe(session_sql, profile):
     quest_item = "Simple_Axe"
     money_reward = 25
-    exp_reward = 100
+    exp_reward = 30
     item = session_sql.query(AllItemsInventory) \
         .filter(AllItemsInventory.name == quest_item) \
         .one()
@@ -380,7 +396,7 @@ def quest_details_buy_simple_axe(session_sql, profile):
         if quest_item in [item.name for item in profile.inventory]:
             profile.quests.quest_1 = True
             profile.money += money_reward
-            profile.exp += exp_reward
+            update_exp_and_lvl(exp_reward, profile)
             session_sql.commit()
             quest_details["completed"] = True
     else:

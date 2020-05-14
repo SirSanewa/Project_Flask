@@ -51,6 +51,7 @@ class BackpackItem(Base):
     item_id = Column(Integer, primary_key=True)
     hero_id = Column(Integer, unique=False)
     name = Column(String(255), ForeignKey("all_backpack_items.name"))
+    amount = Column(Integer)
 
     item_data = relationship(AllItemsBackpack)
 

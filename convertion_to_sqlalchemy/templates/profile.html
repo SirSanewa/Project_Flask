@@ -21,28 +21,28 @@
                 Statystyki:<br><br>
                 <ul class="statistic_list">
                     <li class="statistic_list">
-                        HP: {{ hp }}/{{ max_hp }}
+                        Punkty życia: {{ hp }}/{{ max_hp }}
                     </li>
                     <li class="statistic_list">
                         Mana: {{ mana }}/{{ max_mana }}
                     </li>
                     <li class="statistic_list">
-                        Stamina: {{ stamina }}/{{ max_stamina }}
+                        Energia: {{ stamina }}/{{ max_stamina }}
                     </li>
                     <li class="statistic_list">
-                        Armor: {{ armor }}
+                        Pancerz: {{ armor }}
                     </li>
                     <li class="statistic_list">
-                        Attack damage: {{ attack_dmg }}
+                        Obrażenia: {{ attack_dmg }}
                     </li>
                     <li class="statistic_list">
-                        Critic damage chance: {{ chance_to_crit | round(2) }}
+                        Szansa na trafienie krytyczne: {{ chance_to_crit | round(2) }}
                     </li>
                     <li class="statistic_list">
-                        Steal chance: {{ chance_to_steal | round(2) }}
+                        Szansa na kradzież: {{ chance_to_steal | round(2) }}
                     </li>
                     <li class="statistic_list">
-                        Capacity: {{ capacity }}
+                        Pojemność plecaka: {{ capacity }}
                     </li>
                 </ul>
             </td>
@@ -106,12 +106,25 @@
             </td >
             <td class="backpack">
                 {% if backpack %}
+                <p class="backpack_title"><b>PLECAK:</b></p>
+                <div class="backpack">
                 {% for element in backpack %}
-                <img class="inventory" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace(';',', ') | replace('_',' ')}}">
-                <br>
+                    <div class="backpack_item">
+                        <img class="backpack" src="data:;base64,{{ element[0] }}" title="{{ element[1] | replace('_',' ') + ': ' + element[2] | replace(';',', ') | replace('_',' ')}}">
+                        <div class="buttons">
+                            <div class="amount">
+                                ilość: {{ element[3] }}
+                            </div>
+                            <form>
+                                <button class="backpack_button">użyj</button>
+                                <button class="backpack_button"><span>sprzedaj</span></button>
+                            </form>
+                        </div>
+                    </div>
                 {% endfor %}
+                </div>
                 {% else %}
-                    Nie ma elementów
+                <p class="backpack_title"><b>Plecak pusty</b></p>
                 {% endif %}
             </td>
         </tr>
