@@ -97,10 +97,6 @@ def change_statistic(profile_data, item_data, plus=True):
                 session_sql.query(Profile) \
                     .filter(Profile.id == user_id) \
                     .update(my_dict)
-        if profile_data.hp > profile_data.max_hp:
-            profile_data.hp = profile_data.max_hp
-        if profile_data.mana > profile_data.max_mana:
-            profile_data.mana = profile_data.max_mana
     session_sql.commit()
 
 
@@ -257,7 +253,7 @@ def check_login():
             session["user_id"] = profile_result.id
             return redirect(url_for("profile"))
         else:
-            return redirect(url_for("error"))
+            return redirect("/error")
 
 
 @app.route("/profile", methods=["get", "post"])
@@ -293,7 +289,44 @@ def profile():
         context["inventory"] = create_inventory_for_profile(result.inventory)
     if result.backpack:
         context["backpack"] = create_backpack_for_profile(result.backpack)
+    if request.form.get("use_item"):
+        used_item_name = request.form.get("use_item")
+        use_consumable(used_item_name, result, session_sql, user_id)
+        return redirect("/profile")
     return render_template("profile.html", **context)
+
+
+def use_consumable(item_name, profile_result, session_sql, user_id):
+    changable_statistics = {"hp": "max_hp", "mana": "max_mana", "stamina": "max_stamina"}
+    item = session_sql.query(BackpackItem)\
+        .filter(BackpackItem.name == item_name)\
+        .filter(BackpackItem.hero_id == user_id)\
+        .one()
+    dictionary_item_description = object_as_dict(item.item_data)
+    dictionary_profile = object_as_dict(profile_result)
+    if item.amount > 0:
+        for statistic in dictionary_item_description:
+            statistic_value = dictionary_item_description[statistic]
+            if statistic in changable_statistics and statistic_value is not None:
+                current_profile_statistic_value = dictionary_profile[statistic]
+                max_profile_statistic_value = dictionary_profile[changable_statistics[statistic]]
+                if current_profile_statistic_value < max_profile_statistic_value:
+                    item_statistic_modifier = dictionary_item_description[statistic]
+                    if current_profile_statistic_value + item_statistic_modifier <= max_profile_statistic_value:
+                        my_dict = {statistic: current_profile_statistic_value + item_statistic_modifier}
+                    else:
+                        my_dict = {statistic: max_profile_statistic_value}
+                    item.amount -= 1
+                    if item.amount == 0:
+                        session_sql.query(BackpackItem)\
+                            .filter(BackpackItem.name == item_name)\
+                            .filter(BackpackItem.hero_id == user_id)\
+                            .delete()
+                        session_sql.commit()
+                    session_sql.query(Profile) \
+                        .filter(Profile.id == user_id) \
+                        .update(my_dict)
+                    session_sql.commit()
 
 
 @app.route("/shop/<text>", methods=["get", "post"])

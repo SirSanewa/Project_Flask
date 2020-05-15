@@ -115,9 +115,9 @@
                             <div class="amount">
                                 ilość: {{ element[3] }}
                             </div>
-                            <form>
-                                <button class="backpack_button">użyj</button>
-                                <button class="backpack_button"><span class="button_text">sprzedaj</span></button>
+                            <form method="post">
+                                <button class="backpack_button" name="use_item" value="{{ element[1] }}">użyj</button>
+                                <button class="backpack_button" name="sell_item" value="{{ element[1] }}"><span class="button_text">sprzedaj</span></button>
                             </form>
                         </div>
                     </div>

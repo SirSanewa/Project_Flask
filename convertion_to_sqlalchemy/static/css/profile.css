@@ -87,6 +87,7 @@ span.button_text {
     margin-left: -9.5px;
     }
 progress {
+    width: 250px;
     margin-left: 10px;
     background-color: white;
     }
@@ -100,11 +101,12 @@ progress.stamina::-moz-progress-bar {
     background: RGBA(181, 175, 7);
     }
 div.progress {
+    width: 100%;
     height: 10px;
     float: right;
-    margin-top: 2px;
+    margin-bottom: 10px;
     }
 span.bar_label {
     position: absolute;
-    margin-left: -110px;
+    margin-left: -150px;
     }
