@@ -17,6 +17,7 @@ formatter = logging.Formatter("%(asctime)s- [%(levelname)s]: %(message)s")
 handler = logging.FileHandler('loggs.txt', encoding="utf-8")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
+SALE_RATIO = 0.7
 
 
 def login_required(view):
@@ -145,7 +146,8 @@ def add_consumable(session_sql, profile_result, user_id, new_item_name):
 
 
 def replace_item(profile_result, element, new_item_name, session_sql):
-    profile_result.money += (element.item_data.price * 0.75)
+    global SALE_RATIO
+    profile_result.money += (element.item_data.price * SALE_RATIO)
     change_statistic(profile_result, element.item_data, plus=False)
     element.name = new_item_name
     session_sql.commit()
@@ -298,7 +300,28 @@ def profile():
         used_item_name = request.form.get("use_item")
         use_consumable(used_item_name, result, session_sql, user_id)
         return redirect("/profile")
+    elif request.form.get("sell_item"):
+        sold_item = request.form.get("sell_item")
+        sell_consumable(sold_item, result, session_sql, user_id)
+        return redirect("/profile")
     return render_template("profile.html", **context)
+
+
+def sell_consumable(item_name, profile_result, session_sql, user_id):
+    item = session_sql.query(BackpackItem)\
+        .filter(BackpackItem.name == item_name)\
+        .filter(BackpackItem.hero_id == user_id)\
+        .one()
+    global SALE_RATIO
+    profile_result.money += item.item_data.price * SALE_RATIO
+    item.amount -= 1
+    if item.amount == 0:
+        session_sql.query(BackpackItem) \
+            .filter(BackpackItem.name == item_name) \
+            .filter(BackpackItem.hero_id == user_id) \
+            .delete()
+        profile_result.capacity += 1
+    session_sql.commit()
 
 
 def use_consumable(item_name, profile_result, session_sql, user_id):
@@ -327,7 +350,7 @@ def use_consumable(item_name, profile_result, session_sql, user_id):
                             .filter(BackpackItem.name == item_name)\
                             .filter(BackpackItem.hero_id == user_id)\
                             .delete()
-                        session_sql.commit()
+                        profile_result.capacity += 1
                     session_sql.query(Profile) \
                         .filter(Profile.id == user_id) \
                         .update(my_dict)
@@ -385,11 +408,12 @@ def quests():
         .filter(Profile.id == user_id) \
         .one()
     time_now = datetime.now()
-    quest_time = datetime(2020, 5, 17, 23, 59, 59)
-    context = {"time": quest_time}
+    quest_time = datetime(2020, 5, 28, 23, 59, 59)
+    context = {"time": quest_time,
+               "quest_1": quest_details_buy_simple_axe(session_sql, profile),
+               "quest_2": quest_details_buy_shield(session_sql, profile)}
     if time_now < quest_time:
-        context["quest_1"] = quest_details_buy_simple_axe(session_sql, profile)
-        context["quest_2"] = quest_details_buy_shield(session_sql, profile)
+        pass
     return render_template("quests.html", **context)
 
 
@@ -445,7 +469,6 @@ def quest_details_buy_simple_axe(session_sql, profile):
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: sprzedawanie itemków
 # TODO: walka(mapa)
 # TODO: sprobować porobić testy
-# TODO: questy początkujące, questy tygodnidowe
+# TODO: questy tygodnidowe

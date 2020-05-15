@@ -12,7 +12,7 @@
     {% block page_content %}
     <div class="quests">
         <div class="quest">
-            <p><b>Tygodniowe Questy (do: {{ time }})</b></p><br>
+            <p><b>Questy samouczka:</b></p><br>
             {% if quest_1 %}
             <div class="quests_info">
                 <div class="quest_description">
@@ -34,7 +34,7 @@
                 <div class="quest_description">
                     <p style="margin-top: 20px;">Kup przedmiot typu
                     <a class ="link" href="/shop/Shield">Tarcza</a>.
-                    Nagroda: {{ quest_2.reward }}.</p>
+                    Nagroda: {{ quest_2.reward }}.</p><br>
                 </div>
                 <div class="quest_status">
                     {% if quest_2.completed %}
@@ -45,6 +45,7 @@
                 </div>
             </div>
             {% endif %}
+            <p style="margin-top: 30px;"><b>Questy tygodniowe (do {{ time }}):</b></p>
         </div>
     </div>
     {% endblock %}
