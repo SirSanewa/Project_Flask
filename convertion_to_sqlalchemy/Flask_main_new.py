@@ -87,11 +87,13 @@ def change_statistic(profile_data, item_data, plus=True):
     dictionary_profile = object_as_dict(profile_data)
     for statistic in dictionary_item:
         if statistic in changable_statistics:
-            if dictionary_item[statistic] is not None:
+            item_statistic_modifier = dictionary_item[statistic]
+            if item_statistic_modifier is not None:
+                current_profile_statistic_value = dictionary_profile[statistic]
                 if plus:
-                    my_dict = {statistic: dictionary_profile[statistic] + dictionary_item[statistic]}
+                    my_dict = {statistic: current_profile_statistic_value + item_statistic_modifier}
                 else:
-                    my_dict = {statistic: dictionary_profile[statistic] - dictionary_item[statistic]}
+                    my_dict = {statistic: current_profile_statistic_value - item_statistic_modifier}
                 if statistic in dual_stats:
                     duel_stats_update(session_sql, statistic, dictionary_profile, dictionary_item, plus)
                 session_sql.query(Profile) \
@@ -103,10 +105,13 @@ def change_statistic(profile_data, item_data, plus=True):
 def duel_stats_update(session_sql, statistic, dictionary_profile, dictionary_item, plus):
     user_id = session.get("user_id")
     dual_statistics = {"max_hp": "hp", "max_mana": "mana", "max_stamina": "stamina"}
+    mod_statistic = dual_statistics[statistic]
+    current_profile_statistic_value = dictionary_profile[dual_statistics[statistic]]
+    modifier_value = dictionary_item[statistic]
     if plus:
-        dual_dict = {dual_statistics[statistic]: dictionary_profile[dual_statistics[statistic]] + dictionary_item[statistic]}
+        dual_dict = {mod_statistic: current_profile_statistic_value + modifier_value}
     else:
-        dual_dict = {dual_statistics[statistic]: dictionary_profile[dual_statistics[statistic]] - dictionary_item[statistic]}
+        dual_dict = {mod_statistic: current_profile_statistic_value - modifier_value}
     session_sql.query(Profile) \
         .filter(Profile.id == user_id) \
         .update(dual_dict)
@@ -440,6 +445,7 @@ def quest_details_buy_simple_axe(session_sql, profile):
 if __name__ == "__main__":
     app.run(debug=True)
 
+# TODO: sprzedawanie itemków
 # TODO: walka(mapa)
 # TODO: sprobować porobić testy
 # TODO: questy początkujące, questy tygodnidowe
