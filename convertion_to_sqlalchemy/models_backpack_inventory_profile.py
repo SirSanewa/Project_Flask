@@ -102,6 +102,26 @@ class Profile(Base):
     quests = relationship(Quests, viewonly=True)
 
 
+class Monster(Base):
+    __tablename__ = "monster"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    image = Column(LargeBinary, nullable=False)
+    name = Column(String(255), nullable=False, unique=True)
+    level = Column(Integer, default=1)
+    hp = Column(Integer, default=150)
+    max_hp = Column(Integer, default=150)
+    mana = Column(Integer, default=100)
+    max_mana = Column(Integer, default=100)
+    stamina = Column(Integer, default=100)
+    max_stamina = Column(Integer, default=100)
+    armor = Column(Integer, default=50)
+    attack_dmg = Column(Integer, default=10)
+    chance_to_crit = Column(Float, default=0.15)
+    exp_reward = Column(Integer, default=0)
+    money_reward = Column(Integer, default=0)
+
+
 if __name__ == "__main__":
     engine = create_engine("sqlite:///database.db")
     Base.metadata.create_all(engine)

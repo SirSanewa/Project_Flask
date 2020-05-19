@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Game - Journey</title>
+    <link rel="shortcut icon" href="/static/icon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/journey.css">
+</head>
+<body>
+{% extends "menu.html" %}
+{% block page_content %}
+    <div class="location">
+        <div class="image">
+            <img src="/static/forest_background.jpg">
+        </div>
+        <div class="option">
+            {% if level >= 0 %}
+                <form action="/search_area/forest" method="post">
+                    <button name="forest" value="forest">Rozpocznij podróż</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="location">
+        <div class="image">
+            <img src="/static/sea_background.jpg">
+        </div>
+        <div class="option">
+            {% if level >= 5 %}
+                <form action="/search_area/sea" method="post">
+                    <button name="sea" value="sea">Rozpocznij podróż</button>
+                </form>
+            {% else %}
+                <p>Potrzebujesz poziomu 5 żeby wyruszyć w to miejsce</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="location">
+        <div class="image">
+            <img src="/static/dessert_background.jpg">
+        </div>
+        <div class="option">
+            {% if level >= 10 %}
+                <form action="/search_area/dessert" method="post">
+                    <button name="dessert" value="dessert">Rozpocznij podróż</button>
+                </form>
+            {% else %}
+                <p>Potrzebujesz poziomu 10 żeby wyruszyć w to miejsce</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="location">
+        <div class="image">
+            <img src="/static/graveyard_background.jpg">
+        </div>
+        <div class="option">
+            {% if level >= 20 %}
+                <form action="/search_area/graveyard" method="post">
+                    <button name="graveyard" value="graveyard">Rozpocznij podróż</button>
+                </form>
+            {% else %}
+                <p>Potrzebujesz poziomu 20 żeby wyruszyć w to miejsce</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+</body>
+</html>

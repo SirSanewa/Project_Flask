@@ -90,14 +90,18 @@ progress {
     width: 250px;
     margin-left: 10px;
     background-color: white;
+    border-radius: 20px;
     }
 progress.hp::-moz-progress-bar {
+    border-radius: 20px;
     background: RGBA(125, 4, 4);
     }
 progress.mana::-moz-progress-bar {
+    border-radius: 20px;
     background: RGBA(1, 37, 135);
     }
 progress.stamina::-moz-progress-bar {
+    border-radius: 20px;
     background: RGBA(181, 175, 7);
     }
 div.progress {
@@ -108,5 +112,5 @@ div.progress {
     }
 span.bar_label {
     position: absolute;
-    margin-left: -150px;
+    margin-left: -11%;
     }

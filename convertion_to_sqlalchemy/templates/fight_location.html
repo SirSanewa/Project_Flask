@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Game - Forest</title>
+    <link rel="shortcut icon" href="/static/icon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/fight_location.css">
+    <style>
+    {% if location == 'forest' %}
+    body {
+        background: url("/static/forest_background.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+    {% endif %}
+    {% if location == 'sea' %}
+    body {
+        background: url("/static/sea_background.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+    {% endif %}
+    {% if location == 'dessert' %}
+    body {
+        background: url("/static/dessert_background.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+    {% endif %}
+    {% if location == 'graveyard' %}
+    body {
+        background: url("/static/graveyard_background.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+    {% endif %}
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="fight">
+        <div class="enemy">
+            <div class="image" style="float: left;">
+                <img class="photo" src="/static/knight.jpg" title="Knight">
+            </div>
+            <div class="stat" style="float: right;">
+                <br>
+                <b>name:</b><br>{{ profile.name }}<br>
+                <b>lvl:</b> {{ profile.level }},<br>
+                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ profile.hp }}/{{ profile.max_hp }},<br>
+                <img class="icon" src="/static/ikonki/mana.jpg" title="mana"> {{ profile.mana }}/{{ profile.max_mana }},<br>
+                <img class="icon" src="/static/ikonki/stamina.jpg" title="stamina"> {{ profile.stamina }}/{{ profile.max_stamina }},<br>
+                <img class="icon" src="/static/ikonki/armor.jpg" title="armor"> {{ profile.armor }},<br>
+                <img class="icon" src="/static/ikonki/dmg.jpg" title="DMG"> {{ profile.attack_dmg }},<br>
+                <img class="icon" src="/static/ikonki/crit.jpg" title="chance for crit"> {{ profile.chance_to_crit }}
+            </div>
+        </div>
+        <div class="vs">
+            <br><br><br><br><br><br><br>VS
+        </div>
+        <div class="enemy">
+            <div class="image" style="float: right;">
+                <img class="photo" src="data:;base64,{{ monster_image }}" title="Warewolf">
+            </div>
+            <div class="stat" style="float: left;">
+                <br>
+                <b>name:</b><br>{{ monster.name }}<br>
+                <b>lvl:</b> {{ monster.level }},<br>
+                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ monster.hp }}/{{ monster.max_hp }},<br>
+                <img class="icon" src="/static/ikonki/mana.jpg" title="mana"> {{ monster.mana }}/{{ monster.max_mana }},<br>
+                <img class="icon" src="/static/ikonki/stamina.jpg" title="stamina">
+                {{ monster.stamina }}/{{ monster.max_stamina }},<br>
+                <img class="icon" src="/static/ikonki/armor.jpg" title="armor"> {{ monster.armor }},<br>
+                <img class="icon" src="/static/ikonki/dmg.jpg" title="DMG"> {{ monster.attack_dmg }},<br>
+                <img class="icon" src="/static/ikonki/crit.jpg" title="chance for crit"> {{ monster.chance_to_crit }}
+            </div>
+        </div>
+        <div class="text">
+            <p class="info">Sanewa zadał x obrażeń</p>
+        </div>
+    </div>
+    <hr>
+    <div class="options">
+        <div class="button">
+            atak
+        </div>
+        <div class="button">
+            czar
+        </div>
+        <div class="button">
+            uzycie przedmiotu
+        </div>
+        <div class="button">
+            ucieszka
+        </div>
+    </div>
+</div>
+</body>
+</html>

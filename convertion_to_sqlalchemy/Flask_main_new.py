@@ -1,7 +1,8 @@
 from datetime import datetime
+from random import choice
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, Quests
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, Quests, Monster
 from session import session_creator
 import base64
 from sqlalchemy import asc, inspect
@@ -12,6 +13,7 @@ from functools import wraps
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.secret_key = secret_key
+session_sql = session_creator()
 
 formatter = logging.Formatter("%(asctime)s- [%(levelname)s]: %(message)s")
 handler = logging.FileHandler('loggs.txt', encoding="utf-8")
@@ -34,6 +36,15 @@ def login_required(view):
 def object_as_dict(obj):
     return {item.key: getattr(obj, item.key)
             for item in inspect(obj).mapper.column_attrs}
+
+
+def define_user_id_and_sql_profile():
+    global session_sql
+    user_id = session.get("user_id")
+    profile_result = session_sql.query(Profile)\
+        .filter(Profile.id == user_id)\
+        .one()
+    return user_id, profile_result
 
 
 def create_modifier(dictionary):
@@ -79,15 +90,15 @@ def change_statistic(profile_data, item_data, plus=True):
     values) and plus= parameter to determine if statistics are being added or removed. Makes requested changes in
     database.
     """
-    changable_statistics = ["chance_to_crit", "chance_to_steal","armor", "max_hp", "max_mana", "max_stamina",
+    global session_sql
+    changeable_statistic = ["chance_to_crit", "chance_to_steal","armor", "max_hp", "max_mana", "max_stamina",
                             "attack_dmg", "hp", "mana"]
     dual_stats = ["max_hp", "max_mana", "max_stamina"]
     user_id = session.get("user_id")
-    session_sql = session_creator()
     dictionary_item = object_as_dict(item_data)
     dictionary_profile = object_as_dict(profile_data)
     for statistic in dictionary_item:
-        if statistic in changable_statistics:
+        if statistic in changeable_statistic:
             item_statistic_modifier = dictionary_item[statistic]
             if item_statistic_modifier is not None:
                 current_profile_statistic_value = dictionary_profile[statistic]
@@ -96,14 +107,15 @@ def change_statistic(profile_data, item_data, plus=True):
                 else:
                     my_dict = {statistic: current_profile_statistic_value - item_statistic_modifier}
                 if statistic in dual_stats:
-                    duel_stats_update(session_sql, statistic, dictionary_profile, dictionary_item, plus)
+                    duel_stats_update(statistic, dictionary_profile, dictionary_item, plus)
                 session_sql.query(Profile) \
                     .filter(Profile.id == user_id) \
                     .update(my_dict)
     session_sql.commit()
 
 
-def duel_stats_update(session_sql, statistic, dictionary_profile, dictionary_item, plus):
+def duel_stats_update(statistic, dictionary_profile, dictionary_item, plus):
+    global session_sql
     user_id = session.get("user_id")
     dual_statistics = {"max_hp": "hp", "max_mana": "mana", "max_stamina": "stamina"}
     mod_statistic = dual_statistics[statistic]
@@ -119,7 +131,8 @@ def duel_stats_update(session_sql, statistic, dictionary_profile, dictionary_ite
     session_sql.commit()
 
 
-def add_consumable(session_sql, profile_result, user_id, new_item_name):
+def add_consumable(profile_result, user_id, new_item_name):
+    global session_sql
     item_result = session_sql.query(AllItemsBackpack) \
         .filter(AllItemsBackpack.name == new_item_name) \
         .one()
@@ -145,7 +158,8 @@ def add_consumable(session_sql, profile_result, user_id, new_item_name):
     session_sql.commit()
 
 
-def replace_item(profile_result, element, new_item_name, session_sql):
+def replace_item(profile_result, element, new_item_name):
+    global session_sql
     global SALE_RATIO
     profile_result.money += (element.item_data.price * SALE_RATIO)
     change_statistic(profile_result, element.item_data, plus=False)
@@ -154,7 +168,8 @@ def replace_item(profile_result, element, new_item_name, session_sql):
     change_statistic(profile_result, element.item_data)
 
 
-def add_inventory_item(session_sql, new_item_name, profile_result, user_id):
+def add_inventory_item(new_item_name, profile_result, user_id):
+    global session_sql
     # zwraca wartości nowego przedmiotu
     item_result = session_sql.query(AllItemsInventory) \
         .filter(AllItemsInventory.name == new_item_name) \
@@ -169,7 +184,7 @@ def add_inventory_item(session_sql, new_item_name, profile_result, user_id):
         if new_item_type in [element.item_data.type for element in profile_result.inventory]:
             for element in profile_result.inventory:
                 if new_item_type == element.item_data.type:
-                    replace_item(profile_result, element, new_item_name, session_sql)
+                    replace_item(profile_result, element, new_item_name)
         else:
             item = InventoryItem(hero_id=user_id, name=new_item_name)
             session_sql.add(item)
@@ -178,7 +193,8 @@ def add_inventory_item(session_sql, new_item_name, profile_result, user_id):
     session_sql.commit()
 
 
-def create_quests_for_new_character(login, hashed_password, session_sql):
+def create_quests_for_new_character(login, hashed_password):
+    global session_sql
     profile = session_sql.query(Profile) \
         .filter(Profile.login == login) \
         .filter(Profile.password == hashed_password) \
@@ -209,7 +225,7 @@ def create_new_champion():
     Allows to create new character with passed data.
     :return:
     """
-    session_sql = session_creator()
+    global session_sql
     context = {}
     login = request.form.get("login")
     password = request.form.get("password")
@@ -226,7 +242,7 @@ def create_new_champion():
                     new_profile = Profile(name=name, login=login, password=hashed_password)
                 session_sql.add(new_profile)
                 session_sql.commit()
-                create_quests_for_new_character(login, hashed_password, session_sql)
+                create_quests_for_new_character(login, hashed_password)
                 context["message"] = "Poprawnie dodano do armi!"
             elif password != repeated_password:
                 context["error"] = "Podane hasła nie są identyczne"
@@ -245,7 +261,7 @@ def logout():
 
 @app.route("/check_login", methods=["POST"])
 def check_login():
-    session_sql = session_creator()
+    global session_sql
     login = request.form.get("login")
     password = request.form.get("password")
     try:
@@ -271,43 +287,41 @@ def profile():
     by menu shortcut(menu.html). When calling this endpoint from shortcut menu, id is taken from global
     variable set after logging in to receive most updated data to populate web page. Displays all characters data.
     """
-    user_id = session.get("user_id")
-    session_sql = session_creator()
-    result = session_sql.query(Profile) \
-        .filter(Profile.id == user_id) \
-        .one()
-    context = {"name": result.name,
-               "level": result.level,
-               "exp": result.exp,
-               "max_lvl_exp": int(result.level * 1.5 * 100),
-               "hp": result.hp,
-               "max_hp": result.max_hp,
-               "mana": result.mana,
-               "max_mana": result.max_mana,
-               "stamina": result.stamina,
-               "max_stamina": result.max_stamina,
-               "armor": result.armor,
-               "attack_dmg": result.attack_dmg,
-               "chance_to_crit": result.chance_to_crit,
-               "chance_to_steal": result.chance_to_steal,
-               "capacity": result.capacity,
-               "money": result.money}
-    if result.inventory:
-        context["inventory"] = create_inventory_for_profile(result.inventory)
-    if result.backpack:
-        context["backpack"] = create_backpack_for_profile(result.backpack)
+    global session_sql
+    user_id, profile_result = define_user_id_and_sql_profile()
+    context = {"name": profile_result.name,
+               "level": profile_result.level,
+               "exp": profile_result.exp,
+               "max_lvl_exp": int(profile_result.level * 1.5 * 100),
+               "hp": profile_result.hp,
+               "max_hp": profile_result.max_hp,
+               "mana": profile_result.mana,
+               "max_mana": profile_result.max_mana,
+               "stamina": profile_result.stamina,
+               "max_stamina": profile_result.max_stamina,
+               "armor": profile_result.armor,
+               "attack_dmg": profile_result.attack_dmg,
+               "chance_to_crit": profile_result.chance_to_crit,
+               "chance_to_steal": profile_result.chance_to_steal,
+               "capacity": profile_result.capacity,
+               "money": profile_result.money}
+    if profile_result.inventory:
+        context["inventory"] = create_inventory_for_profile(profile_result.inventory)
+    if profile_result.backpack:
+        context["backpack"] = create_backpack_for_profile(profile_result.backpack)
     if request.form.get("use_item"):
         used_item_name = request.form.get("use_item")
-        use_consumable(used_item_name, result, session_sql, user_id)
+        use_consumable(used_item_name, profile_result, user_id)
         return redirect("/profile")
     elif request.form.get("sell_item"):
         sold_item = request.form.get("sell_item")
-        sell_consumable(sold_item, result, session_sql, user_id)
+        sell_consumable(sold_item, profile_result, user_id)
         return redirect("/profile")
     return render_template("profile.html", **context)
 
 
-def sell_consumable(item_name, profile_result, session_sql, user_id):
+def sell_consumable(item_name, profile_result, user_id):
+    global session_sql
     item = session_sql.query(BackpackItem)\
         .filter(BackpackItem.name == item_name)\
         .filter(BackpackItem.hero_id == user_id)\
@@ -324,7 +338,8 @@ def sell_consumable(item_name, profile_result, session_sql, user_id):
     session_sql.commit()
 
 
-def use_consumable(item_name, profile_result, session_sql, user_id):
+def use_consumable(item_name, profile_result, user_id):
+    global session_sql
     changable_statistics = {"hp": "max_hp", "mana": "max_mana", "stamina": "max_stamina"}
     item = session_sql.query(BackpackItem)\
         .filter(BackpackItem.name == item_name)\
@@ -366,9 +381,9 @@ def shop(text):
     with a use of change_statistics().
     :return:
     """
+    global session_sql
     context = {}
-    session_sql = session_creator()
-    user_id = session.get("user_id")
+    user_id, profile_result = define_user_id_and_sql_profile()
     if text == "Consumable":
         result = session_sql.query(AllItemsBackpack) \
             .filter(AllItemsBackpack.type == text) \
@@ -376,12 +391,9 @@ def shop(text):
             .all()
     else:
         result = session_sql.query(AllItemsInventory) \
-            .filter(AllItemsInventory.type == text)\
-            .order_by(asc(AllItemsInventory.price))\
+            .filter(AllItemsInventory.type == text) \
+            .order_by(asc(AllItemsInventory.price)) \
             .all()
-    profile_result = session_sql.query(Profile)\
-        .filter(Profile.id == user_id)\
-        .one()
     context["inventory"] = create_inventory_for_shop(result)
     # jeśli zostanie wskazany przedmiot do kupienia
     if request.form.get("item"):
@@ -390,11 +402,11 @@ def shop(text):
         new_item_name = item_details[0]
         new_item_type = item_details[1]
         if new_item_type == "Consumable":
-            if add_consumable(session_sql, profile_result, user_id, new_item_name):
-                context["error"] = add_consumable(session_sql, profile_result, user_id, new_item_name)
+            if add_consumable(profile_result, user_id, new_item_name):
+                context["error"] = add_consumable(profile_result, user_id, new_item_name)
         else:
-            if add_inventory_item(session_sql, new_item_name, profile_result, user_id):
-                context["error"] = add_inventory_item(session_sql, new_item_name, profile_result, user_id)
+            if add_inventory_item(new_item_name, profile_result, user_id):
+                context["error"] = add_inventory_item(new_item_name, profile_result, user_id)
     context["money"] = profile_result.money
     return render_template("shop.html", **context)
 
@@ -402,22 +414,20 @@ def shop(text):
 @app.route("/quests")
 @login_required
 def quests():
-    user_id = session.get("user_id")
-    session_sql = session_creator()
-    profile = session_sql.query(Profile) \
-        .filter(Profile.id == user_id) \
-        .one()
+    global session_sql
+    _, profile_result = define_user_id_and_sql_profile()
     time_now = datetime.now()
     quest_time = datetime(2020, 5, 28, 23, 59, 59)
     context = {"time": quest_time,
-               "quest_1": quest_details_buy_simple_axe(session_sql, profile),
-               "quest_2": quest_details_buy_shield(session_sql, profile)}
+               "quest_1": quest_details_buy_simple_axe(profile_result),
+               "quest_2": quest_details_buy_shield(profile_result)}
     if time_now < quest_time:
         pass
     return render_template("quests.html", **context)
 
 
-def quest_details_buy_shield(session_sql, profile):
+def quest_details_buy_shield(profile):
+    global session_sql
     quest_item_type = "Shield"
     money_reward = 25
     exp_reward = 50
@@ -444,7 +454,8 @@ def update_exp_and_lvl(exp_reward, profile):
         profile.level += 1
 
 
-def quest_details_buy_simple_axe(session_sql, profile):
+def quest_details_buy_simple_axe(profile):
+    global session_sql
     quest_item = "Simple_Axe"
     money_reward = 25
     exp_reward = 30
@@ -466,9 +477,36 @@ def quest_details_buy_simple_axe(session_sql, profile):
     return quest_details
 
 
+@app.route("/journey")
+@login_required
+def journey():
+    global session_sql
+    _, profile_result = define_user_id_and_sql_profile()
+    return render_template("journey.html", level=profile_result.level)
+
+
+@app.route("/search_area/<location>", methods=["post", "get"])
+@login_required
+def search_area(location):
+    global session_sql
+    monster_list = {"forest": ["Warewolf"],
+                    "sea": None,
+                    "dessert": None,
+                    "graveyard": None}
+    monster_choosen = choice(monster_list[location])
+    monster = session_sql.query(Monster)\
+        .filter(Monster.name == monster_choosen)\
+        .one()
+    _, profile_result = define_user_id_and_sql_profile()
+    context = {"location": location,
+               "monster": monster,
+               "monster_image": base64.b64encode(monster.image).decode("utf-8"),
+               "profile": profile_result}
+    return render_template("fight_location.html", **context)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
 # TODO: walka(mapa)
-# TODO: sprobować porobić testy
 # TODO: questy tygodnidowe
