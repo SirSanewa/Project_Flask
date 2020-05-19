@@ -1,5 +1,7 @@
 from datetime import datetime
 from random import choice
+from time import sleep
+
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
 from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, Quests, Monster
@@ -485,28 +487,44 @@ def journey():
     return render_template("journey.html", level=profile_result.level)
 
 
-@app.route("/search_area/<location>", methods=["post", "get"])
+@app.route("/searching/<location>", methods=["post", "get"])
 @login_required
-def search_area(location):
+def searching(location):
     global session_sql
-    monster_list = {"forest": ["Warewolf"],
+    monster_list = {"forest": ["Warewolf", "Goblin"],
                     "sea": None,
                     "dessert": None,
                     "graveyard": None}
     monster_choosen = choice(monster_list[location])
-    monster = session_sql.query(Monster)\
-        .filter(Monster.name == monster_choosen)\
+    return redirect(url_for("search_area", location=location, monster=monster_choosen))
+
+
+@app.route("/search_area/", methods=["get","post"])
+@login_required
+def search_area():
+    global session_sql
+    location = request.args["location"]
+    monster_name = request.args["monster"]
+    monster = session_sql.query(Monster) \
+        .filter(Monster.name == monster_name) \
         .one()
     _, profile_result = define_user_id_and_sql_profile()
-    context = {"location": location,
-               "monster": monster,
-               "monster_image": base64.b64encode(monster.image).decode("utf-8"),
-               "profile": profile_result}
-    return render_template("fight_location.html", **context)
+    #test - odbiera hp()
+    if profile_result.hp > 0 and monster.hp > 0:
+        if request.form.get("attack"):
+            monster.hp -= int(profile_result.attack_dmg-(monster.armor/10))
+            if monster.hp <= 0:
+                return "Wygrałeś" # przeniesienie do ekranu wyprawy z komunikatem o wygranej
+            context = {"location": location,
+                       "monster": monster,
+                       "monster_image": base64.b64encode(monster.image).decode("utf-8"),
+                       "profile": profile_result}
+            return render_template("fight_location.html", **context)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: walka(mapa)
+# TODO: podnoszenie statów po levelu, lvl przeciwnika
+# TODO: walka
 # TODO: questy tygodnidowe
