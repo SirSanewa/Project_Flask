@@ -454,11 +454,15 @@ def quest_details_buy_shield(profile):
 
 
 def update_exp_and_lvl(exp_reward, profile):
+    level_update_modifier = 0.05
     profile.exp += exp_reward
     max_exp = int(profile.level * 1.5 * 100)
-    if profile.exp > max_exp:
+    while profile.exp > max_exp:
         profile.exp -= max_exp
         profile.level += 1
+        profile.max_hp += profile.max_hp * level_update_modifier
+        profile.max_mana += profile.max_mana * level_update_modifier
+        profile.attack_dmg += profile.attack_dmg * level_update_modifier
 
 
 def quest_details_buy_simple_axe(profile):
@@ -514,31 +518,38 @@ def search_area():
         .filter(Monster.name == monster_name) \
         .one()
     _, profile_result = define_user_id_and_sql_profile()
+    session_sql.commit()
     # test - odbiera hp()
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
                "profile": profile_result}
-    if profile_result.hp > 7 and monster.hp > 7:
+    if profile_result.hp > 0 and monster.hp > 0:
         if request.form.get("attack"):
             your_move = attack(profile_result, monster)
             enemy_move = monster_attack(monster, profile_result)
             context["your_move"] = your_move
             context["enemy_move"] = enemy_move
-            if profile_result.hp < 0 and monster.hp > 0:
-                reset_monster_stats(monster)
-                profile_result.hp = 1
-                session_sql.commit()
-                return render_template("fight_result.html", result="lost")
-            elif profile_result.hp > 0 and monster.hp < 0:
-                profile_result.money += monster.money_reward
-                update_exp_and_lvl(monster.exp_reward, profile_result)
-                reset_monster_stats(monster)
-                session_sql.commit()
-                return render_template("fight_result.html",
-                                       result="win",
-                                       money_reward=monster.money_reward,
-                                       exp_reward=monster.exp_reward)
+        elif request.form.get("spell"):
+            your_move = spell(profile_result, monster)
+            enemy_move = monster_attack(monster, profile_result)
+            context["your_move"] = your_move
+            context["enemy_move"] = enemy_move
+        # sprawdzenie kto wygrał
+        if profile_result.hp < 0:
+            reset_monster_stats(monster)
+            profile_result.hp = 1
+            session_sql.commit()
+            return render_template("fight_result.html", result="lost")
+        elif monster.hp < 0:
+            profile_result.money += monster.money_reward
+            update_exp_and_lvl(monster.exp_reward, profile_result)
+            reset_monster_stats(monster)
+            session_sql.commit()
+            return render_template("fight_result.html",
+                                   result="win",
+                                   money_reward=monster.money_reward,
+                                   exp_reward=monster.exp_reward)
     return render_template("fight_location.html", **context)
 
 
@@ -559,9 +570,29 @@ def attack(profile_result, monster):
         session_sql.commit()
         return f"Zadałeś {new_dmg} obrażeń krytycznych przeciwnikowi"
     else:
-        monster.hp -= dmg
-        session_sql.commit()
-        return f"Zadałeś {dmg} obrażeń przeciwnikowi"
+        if_hit_chance = 80
+        if_hit_result = randint(1, 100)
+        if if_hit_result > if_hit_chance:
+            return f"Chybiłeś atak wręcz"
+        else:
+            monster.hp -= dmg
+            session_sql.commit()
+            return f"Zadałeś {dmg} obrażeń przeciwnikowi"
+
+
+def spell(profile_result, monster):
+    _spell_cost = 40
+    _spell_dmg = 40
+    if_hit_chance = 50
+    if_hit_result = randint(1, 100)
+    if profile_result.mana >= _spell_cost:
+        profile_result.mana -= _spell_cost
+        if if_hit_result <= if_hit_chance:
+            monster.hp -= _spell_dmg
+            session_sql.commit()
+            return f"Wykonałeś atak magiczny i zadałeś {_spell_dmg} dmg obrażeń"
+        else:
+            return f"Chybiłeś atak magiczny"
 
 
 def monster_attack(monster, profile_result):
@@ -572,7 +603,7 @@ def monster_attack(monster, profile_result):
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
     if result <= magic_attack_chance and monster.mana > _spell_cost:
-        if_hit_chance = 40
+        if_hit_chance = 50
         if_hit_result = randint(1, 100)
         monster.mana -= _spell_cost
         if if_hit_result <= if_hit_chance:
@@ -584,22 +615,28 @@ def monster_attack(monster, profile_result):
     else:
         crit_chance = int(monster.chance_to_crit * 100)
         chance_to_crit_result = randint(1, 100)
-        dmg = int(profile_result.attack_dmg - (monster.armor / 10))
+        dmg = int(monster.attack_dmg - (profile_result.armor / 10))
         if chance_to_crit_result <= crit_chance:
             new_dmg = dmg * crit_dmg_multiplier
             profile_result.hp -= new_dmg
             session_sql.commit()
             return f"{monster.name}, zaatakował pazurem i zadał {new_dmg} krytycznych obrażeń"
         else:
-            profile_result.hp -= dmg
-            session_sql.commit()
-            return f"{monster.name}, zaatakował pazurem i zadał {dmg} obrażeń"
+            if_hit_chance = 80
+            if_hit_result = randint(1, 100)
+            if if_hit_result > if_hit_chance:
+                return f"{monster.name} chybił atak wręcz"
+            else:
+                profile_result.hp -= dmg
+                session_sql.commit()
+                return f"{monster.name}, zaatakował pazurem i zadał {dmg} obrażeń"
 
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: szpital(leczenie kosztuje energie)
-# TODO: podnoszenie statów po levelu, lvl przeciwnika
+# TODO: ucieczka i użycei miksturki
+# TODO: szpital(leczenie kosztuje energie?)
+# TODO: lvl przeciwnika(modyfikowanie statystyk)
 # TODO: walka
 # TODO: questy tygodnidowe

@@ -104,9 +104,13 @@
             </form>
         </div>
         <div class="button">
+            {% if profile.mana >= 40 %}
             <form method="post">
                 <button name="spell" value="spell">użycie czaru</button>
             </form>
+            {% else %}
+                brak many na czar
+            {% endif %}
         </div>
         <div class="button">
             uzycie przedmiotu

@@ -90,7 +90,7 @@ class Profile(Base):
     max_mana = Column(Integer, default=100)
     stamina = Column(Integer, default=100)
     max_stamina = Column(Integer, default=100)
-    armor = Column(Integer, default=50)
+    armor = Column(Integer, default=20)
     attack_dmg = Column(Integer, default=10)
     chance_to_steal = Column(Float, default=0.10)
     chance_to_crit = Column(Float, default=0.15)
