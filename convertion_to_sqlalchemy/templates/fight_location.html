@@ -72,7 +72,7 @@
         </div>
         <div class="enemy">
             <div class="image" style="float: right;">
-                <img class="photo" src="data:;base64,{{ monster_image }}" title="Warewolf">
+                <img class="photo" src="data:;base64,{{ monster_image }}" title="{{ monster.name }}">
             </div>
             <div class="stat" style="float: left;">
                 <br>
@@ -88,24 +88,31 @@
             </div>
         </div>
         <div class="text">
-            <p class="info">Sanewa zadał x obrażeń</p>
+            {% if your_move and enemy_move %}
+            <p class="fight_info">{{ your_move }}</p>
+            <p class="fight_info">{{ enemy_move }}</p>
+            {% else %}
+            <p class="info">Zacznij walkę!</p>
+            {% endif %}
         </div>
     </div>
     <hr>
     <div class="options">
         <div class="button">
             <form method="post">
-                <button name="attack" value="attack">atak</button>
+                <button name="attack" value="attack">atak wręcz</button>
             </form>
         </div>
         <div class="button">
-            czar
+            <form method="post">
+                <button name="spell" value="spell">użycie czaru</button>
+            </form>
         </div>
         <div class="button">
             uzycie przedmiotu
         </div>
         <div class="button">
-            ucieszka
+            ucieczka
         </div>
     </div>
 </div>

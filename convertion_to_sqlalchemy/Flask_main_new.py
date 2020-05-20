@@ -1,10 +1,11 @@
 from datetime import datetime
-from random import choice
+from random import choice, randint
 from time import sleep
 
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, Quests, Monster
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, \
+    Quests, Monster
 from session import session_creator
 import base64
 from sqlalchemy import asc, inspect
@@ -43,8 +44,8 @@ def object_as_dict(obj):
 def define_user_id_and_sql_profile():
     global session_sql
     user_id = session.get("user_id")
-    profile_result = session_sql.query(Profile)\
-        .filter(Profile.id == user_id)\
+    profile_result = session_sql.query(Profile) \
+        .filter(Profile.id == user_id) \
         .one()
     return user_id, profile_result
 
@@ -64,7 +65,8 @@ def create_inventory_for_profile(database):
     for element in database:
         dictionary = object_as_dict(element.item_data)
         item_modifier = create_modifier(dictionary)
-        item_list.append((base64.b64encode(element.item_data.image).decode("utf-8"), element.name, item_modifier, element.item_data.type))
+        item_list.append((base64.b64encode(element.item_data.image).decode("utf-8"), element.name, item_modifier,
+                          element.item_data.type))
     return item_list
 
 
@@ -73,7 +75,8 @@ def create_backpack_for_profile(database):
     for element in database:
         dictionary = object_as_dict(element.item_data)
         item_modifier = create_modifier(dictionary)
-        item_list.append((base64.b64encode(element.item_data.image).decode("utf-8"), element.name, item_modifier, element.amount))
+        item_list.append(
+            (base64.b64encode(element.item_data.image).decode("utf-8"), element.name, item_modifier, element.amount))
     return item_list
 
 
@@ -82,7 +85,8 @@ def create_inventory_for_shop(database):
     for element in database:
         dictionary = object_as_dict(element)
         item_modifier = create_modifier(dictionary)
-        item_list.append((base64.b64encode(element.image).decode("utf-8"), element.name, item_modifier, element.type, element.price))
+        item_list.append(
+            (base64.b64encode(element.image).decode("utf-8"), element.name, item_modifier, element.type, element.price))
     return item_list
 
 
@@ -93,7 +97,7 @@ def change_statistic(profile_data, item_data, plus=True):
     database.
     """
     global session_sql
-    changeable_statistic = ["chance_to_crit", "chance_to_steal","armor", "max_hp", "max_mana", "max_stamina",
+    changeable_statistic = ["chance_to_crit", "chance_to_steal", "armor", "max_hp", "max_mana", "max_stamina",
                             "attack_dmg", "hp", "mana"]
     dual_stats = ["max_hp", "max_mana", "max_stamina"]
     user_id = session.get("user_id")
@@ -144,9 +148,9 @@ def add_consumable(profile_result, user_id, new_item_name):
         return "Brak środków"
     else:
         if new_item_name in [item.name for item in profile_result.backpack]:
-            current_item = session_sql.query(BackpackItem)\
-                .filter(BackpackItem.name == new_item_name)\
-                .filter(BackpackItem.hero_id == user_id)\
+            current_item = session_sql.query(BackpackItem) \
+                .filter(BackpackItem.name == new_item_name) \
+                .filter(BackpackItem.hero_id == user_id) \
                 .one()
             current_item.amount += 1
         else:
@@ -235,7 +239,8 @@ def create_new_champion():
     name = request.form.get("hero_name")
     if password and login and name:
         logins_and_names_list = session_sql.query(Profile).all()
-        if login not in [element.login for element in logins_and_names_list] and name not in [element.login for element in logins_and_names_list]:
+        if login not in [element.login for element in logins_and_names_list] and name not in [element.login for element
+                                                                                              in logins_and_names_list]:
             if password == repeated_password:
                 hashed_password = generate_password_hash(password)
                 if any(substring in name for substring in ["Lukasz", "lukasz", "Łukasz", "łukasz"]):
@@ -324,9 +329,9 @@ def profile():
 
 def sell_consumable(item_name, profile_result, user_id):
     global session_sql
-    item = session_sql.query(BackpackItem)\
-        .filter(BackpackItem.name == item_name)\
-        .filter(BackpackItem.hero_id == user_id)\
+    item = session_sql.query(BackpackItem) \
+        .filter(BackpackItem.name == item_name) \
+        .filter(BackpackItem.hero_id == user_id) \
         .one()
     global SALE_RATIO
     profile_result.money += item.item_data.price * SALE_RATIO
@@ -343,9 +348,9 @@ def sell_consumable(item_name, profile_result, user_id):
 def use_consumable(item_name, profile_result, user_id):
     global session_sql
     changable_statistics = {"hp": "max_hp", "mana": "max_mana", "stamina": "max_stamina"}
-    item = session_sql.query(BackpackItem)\
-        .filter(BackpackItem.name == item_name)\
-        .filter(BackpackItem.hero_id == user_id)\
+    item = session_sql.query(BackpackItem) \
+        .filter(BackpackItem.name == item_name) \
+        .filter(BackpackItem.hero_id == user_id) \
         .one()
     dictionary_item_description = object_as_dict(item.item_data)
     dictionary_profile = object_as_dict(profile_result)
@@ -363,9 +368,9 @@ def use_consumable(item_name, profile_result, user_id):
                         my_dict = {statistic: max_profile_statistic_value}
                     item.amount -= 1
                     if item.amount == 0:
-                        session_sql.query(BackpackItem)\
-                            .filter(BackpackItem.name == item_name)\
-                            .filter(BackpackItem.hero_id == user_id)\
+                        session_sql.query(BackpackItem) \
+                            .filter(BackpackItem.name == item_name) \
+                            .filter(BackpackItem.hero_id == user_id) \
                             .delete()
                         profile_result.capacity += 1
                     session_sql.query(Profile) \
@@ -499,7 +504,7 @@ def searching(location):
     return redirect(url_for("search_area", location=location, monster=monster_choosen))
 
 
-@app.route("/search_area/", methods=["get","post"])
+@app.route("/search_area/", methods=["get", "post"])
 @login_required
 def search_area():
     global session_sql
@@ -509,22 +514,92 @@ def search_area():
         .filter(Monster.name == monster_name) \
         .one()
     _, profile_result = define_user_id_and_sql_profile()
-    #test - odbiera hp()
-    if profile_result.hp > 0 and monster.hp > 0:
+    # test - odbiera hp()
+    context = {"location": location,
+               "monster": monster,
+               "monster_image": base64.b64encode(monster.image).decode("utf-8"),
+               "profile": profile_result}
+    if profile_result.hp > 7 and monster.hp > 7:
         if request.form.get("attack"):
-            monster.hp -= int(profile_result.attack_dmg-(monster.armor/10))
-            if monster.hp <= 0:
-                return "Wygrałeś" # przeniesienie do ekranu wyprawy z komunikatem o wygranej
-            context = {"location": location,
-                       "monster": monster,
-                       "monster_image": base64.b64encode(monster.image).decode("utf-8"),
-                       "profile": profile_result}
-            return render_template("fight_location.html", **context)
+            your_move = attack(profile_result, monster)
+            enemy_move = monster_attack(monster, profile_result)
+            context["your_move"] = your_move
+            context["enemy_move"] = enemy_move
+            if profile_result.hp < 0 and monster.hp > 0:
+                reset_monster_stats(monster)
+                profile_result.hp = 1
+                session_sql.commit()
+                return render_template("fight_result.html", result="lost")
+            elif profile_result.hp > 0 and monster.hp < 0:
+                profile_result.money += monster.money_reward
+                update_exp_and_lvl(monster.exp_reward, profile_result)
+                reset_monster_stats(monster)
+                session_sql.commit()
+                return render_template("fight_result.html",
+                                       result="win",
+                                       money_reward=monster.money_reward,
+                                       exp_reward=monster.exp_reward)
+    return render_template("fight_location.html", **context)
+
+
+def reset_monster_stats(monster):
+    monster.hp = monster.max_hp
+    monster.mana = monster.max_mana
+
+
+def attack(profile_result, monster):
+    global session_sql
+    crit_dmg_multiplier = 2
+    crit_chance = int(profile_result.chance_to_crit * 100)
+    chance_to_crit_result = randint(1, 100)
+    dmg = int(profile_result.attack_dmg - (monster.armor / 10))
+    if chance_to_crit_result <= crit_chance:
+        new_dmg = dmg * crit_dmg_multiplier
+        monster.hp -= new_dmg
+        session_sql.commit()
+        return f"Zadałeś {new_dmg} obrażeń krytycznych przeciwnikowi"
+    else:
+        monster.hp -= dmg
+        session_sql.commit()
+        return f"Zadałeś {dmg} obrażeń przeciwnikowi"
+
+
+def monster_attack(monster, profile_result):
+    global session_sql
+    _spell_cost = 40
+    _spell_dmg = 40
+    magic_attack_chance = 20
+    crit_dmg_multiplier = 2.5
+    result = randint(1, 100)
+    if result <= magic_attack_chance and monster.mana > _spell_cost:
+        if_hit_chance = 40
+        if_hit_result = randint(1, 100)
+        monster.mana -= _spell_cost
+        if if_hit_result <= if_hit_chance:
+            profile_result.hp -= _spell_dmg
+            session_sql.commit()
+            return f"{monster.name}, wykonał atak magiczny i zadał {_spell_dmg} dmg obrażeń"
+        else:
+            return f"{monster.name}, chybił atak magiczny"
+    else:
+        crit_chance = int(monster.chance_to_crit * 100)
+        chance_to_crit_result = randint(1, 100)
+        dmg = int(profile_result.attack_dmg - (monster.armor / 10))
+        if chance_to_crit_result <= crit_chance:
+            new_dmg = dmg * crit_dmg_multiplier
+            profile_result.hp -= new_dmg
+            session_sql.commit()
+            return f"{monster.name}, zaatakował pazurem i zadał {new_dmg} krytycznych obrażeń"
+        else:
+            profile_result.hp -= dmg
+            session_sql.commit()
+            return f"{monster.name}, zaatakował pazurem i zadał {dmg} obrażeń"
 
 
 if __name__ == "__main__":
     app.run(debug=True)
 
+# TODO: szpital(leczenie kosztuje energie)
 # TODO: podnoszenie statów po levelu, lvl przeciwnika
 # TODO: walka
 # TODO: questy tygodnidowe

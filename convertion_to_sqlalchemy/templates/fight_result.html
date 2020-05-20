@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Game - Result</title>
+    <style>
+    html body {
+        background: url("/static/background2.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        height: 100%
+        margin-left: 100px;
+        text-align: center;
+    }
+    div.result {
+        border-radius: 25px;
+        border: 1px solid black;
+        height: 200px;
+        width: 50%;
+        margin-top: 15%;
+        margin-left: 25%;
+    }
+    p.text {
+        margin-top: 10%;
+        font-size: 32px;
+    }
+    a.link:link, a.link:visited {
+        color: white;
+        text-decoration: none;
+    }
+    a.link:hover, a.link:active {
+        boarder-left: solid black 1px;
+        color: black;
+        text-decoration: none;
+    }
+    p.reward {
+        margin-top: -5%;
+    }
+    </style>
+</head>
+<body>
+    {% if result == 'win' %}
+    <div class="result" style="background-color: RGBA(6, 140, 21, 0.7)">
+        <p class="text">Wygrana!</p><br>
+        <p class="reward">Otrzymujesz {{ money_reward }}$ i {{ exp_reward }}exp.</p>
+        <a class="link" href="/profile">Powrót do profilu</a>
+    </div>
+    {% else %}
+    <div class="result" style="background-color: RGBA(252, 0, 0, 0.7)">
+        <p class="text">Porażka ...</p><br>
+        <a class="link" href="/profile">Powrót do profilu</a>
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -62,8 +62,8 @@ for file in os.listdir(directory):
         item_name = item_elements[0]
         statistics = item_elements[1]
         reward = item_elements[2]
-        money_reward = int(reward[:2])
-        exp_reward = int(reward[2:])
+        money_reward = int(reward.split(" ")[0])
+        exp_reward = int(reward.split(" ")[1])
         split_statistics = statistics.split(";")
         dictionary = {"attack_dmg": None, "chance_to_crit": None, "hp": None, "mana": None,
                       "stamina": None, "armor": None, "level": None}
