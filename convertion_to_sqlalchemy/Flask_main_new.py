@@ -528,6 +528,8 @@ def searching(location):
 @login_required
 def search_area():
     global session_sql
+    your_move = None
+    enemy_move = None
     money_lost_modifier = 0.1
     location = request.args["location"]
     monster_name = request.args["monster"]
@@ -544,33 +546,27 @@ def search_area():
     if profile_result.hp > 0 and monster.hp > 0:
         if request.form.get("attack"):
             your_move = attack(profile_result, monster)
-            enemy_move = monster_attack(monster, profile_result)
-            context["your_move"] = your_move
-            context["enemy_move"] = enemy_move
         elif request.form.get("spell"):
             your_move = spell(profile_result, monster)
-            enemy_move = monster_attack(monster, profile_result)
-            context["your_move"] = your_move
-            context["enemy_move"] = enemy_move
         elif request.form.get("list"):
             used_item_name = request.form.get("list")
             your_move = use_consumable(used_item_name, profile_result)
-            enemy_move = monster_attack(monster, profile_result)
-            context["your_move"] = your_move
-            context["enemy_move"] = enemy_move
         elif request.form.get("run"):
             money_lost = profile_result.money * money_lost_modifier
-            profile_result.money -= money_lost
+            profile_result.money -= int(money_lost)
             reset_monster_stats(monster)
             session_sql.commit()
-            return render_template("fight_result.html", result="run", money=money_lost)
-        # sprawdzenie kto wygrał
+            return render_template("fight_result.html", result="run", money=int(money_lost))
+        if request.form:
+            enemy_move = monster_attack(monster, profile_result)
+        context["your_move"] = your_move
+        context["enemy_move"] = enemy_move
         if profile_result.hp < 0:
             reset_monster_stats(monster)
             profile_result.hp = 1
             update_exp_and_lvl(monster.exp_reward, profile_result, win_fight=False)
             session_sql.commit()
-            return render_template("fight_result.html", result="lost")
+            return render_template("fight_result.html", result="lost", exp=monster.exp_reward)
         elif monster.hp < 0:
             profile_result.money += monster.money_reward
             update_exp_and_lvl(monster.exp_reward, profile_result)
