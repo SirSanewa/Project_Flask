@@ -651,7 +651,7 @@ def attack(profile_result, monster):
 
 def spell(profile_result, monster, hero_spell_cost, hero_spell_dmg):
     global session_sql
-    if_hit_chance = 50
+    if_hit_chance = 60
     if_hit_result = randint(1, 100)
     if profile_result.mana >= hero_spell_cost:
         profile_result.mana -= hero_spell_cost
@@ -671,7 +671,7 @@ def monster_attack(monster, profile_result):
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
     if result <= magic_attack_chance and monster.mana > _spell_cost:
-        if_hit_chance = 50
+        if_hit_chance = 60
         if_hit_result = randint(1, 100)
         monster.mana -= _spell_cost
         if if_hit_result <= if_hit_chance:
