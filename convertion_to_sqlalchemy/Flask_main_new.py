@@ -536,7 +536,7 @@ def journey():
 def searching(location):
     global session_sql
     _, profile_result = define_user_id_and_sql_profile()
-    monster_list = {"forest": ["Warewolf", "Goblin"],
+    monster_list = {"forest": ["Warewolf", "Goblin", "Ent", "Centaur"],
                     "sea": None,
                     "dessert": None,
                     "graveyard": None}
@@ -690,9 +690,9 @@ def monster_attack(monster, profile_result):
         if if_hit_result <= if_hit_chance:
             profile_result.hp -= _spell_dmg
             session_sql.commit()
-            return f"{monster.name}, wykonał atak magiczny i zadał {_spell_dmg} dmg obrażeń"
+            return f"{monster.name} wykonał atak magiczny i zadał {_spell_dmg} dmg obrażeń"
         else:
-            return f"{monster.name}, chybił atak magiczny"
+            return f"{monster.name} chybił atak magiczny"
     else:
         crit_chance = int(monster.chance_to_crit * 100)
         chance_to_crit_result = randint(1, 100)
@@ -701,7 +701,7 @@ def monster_attack(monster, profile_result):
             new_dmg = dmg * crit_dmg_multiplier
             profile_result.hp -= new_dmg
             session_sql.commit()
-            return f"{monster.name}, zaatakował pazurem i zadał {new_dmg} krytycznych obrażeń"
+            return f"{monster.name} zaatakował i zadał {new_dmg} krytycznych obrażeń"
         else:
             if_hit_chance = 80
             if_hit_result = randint(1, 100)
@@ -710,7 +710,7 @@ def monster_attack(monster, profile_result):
             else:
                 profile_result.hp -= dmg
                 session_sql.commit()
-                return f"{monster.name}, zaatakował pazurem i zadał {dmg} obrażeń"
+                return f"{monster.name} zaatakował i zadał {dmg} obrażeń"
 
 
 if __name__ == "__main__":
