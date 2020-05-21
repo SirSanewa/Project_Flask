@@ -365,19 +365,18 @@ def use_consumable(item_name, profile_result):
                         my_dict = {statistic: current_profile_statistic_value + item_statistic_modifier}
                     else:
                         my_dict = {statistic: max_profile_statistic_value}
-                    item.amount -= 1
-                    if item.amount == 0:
-                        session_sql.query(BackpackItem) \
-                            .filter(BackpackItem.name == item_name) \
-                            .filter(BackpackItem.hero_id == profile_result.id) \
-                            .delete()
-                        profile_result.capacity += 1
-                    print(my_dict)
                     session_sql.query(Profile) \
                         .filter(Profile.id == profile_result.id) \
                         .update(my_dict)
-                    session_sql.commit()
-                    return f"Użyto {item_name.replace('_', ' ')}"
+        item.amount -= 1
+        if item.amount == 0:
+            session_sql.query(BackpackItem) \
+                .filter(BackpackItem.name == item_name) \
+                .filter(BackpackItem.hero_id == profile_result.id) \
+                .delete()
+            profile_result.capacity += 1
+        session_sql.commit()
+        return f"Użyto {item_name.replace('_', ' ')}"
 
 
 @app.route("/shop/<text>", methods=["get", "post"])
