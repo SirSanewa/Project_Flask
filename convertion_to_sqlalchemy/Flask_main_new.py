@@ -347,6 +347,7 @@ def sell_consumable(item_name, profile_result, user_id):
 def use_consumable(item_name, profile_result):
     global session_sql
     changable_statistics = {"hp": "max_hp", "mana": "max_mana", "stamina": "max_stamina"}
+    other_statistics = ["attack_dmg"]
     item = session_sql.query(BackpackItem) \
         .filter(BackpackItem.name == item_name) \
         .filter(BackpackItem.hero_id == profile_result.id) \
@@ -368,13 +369,27 @@ def use_consumable(item_name, profile_result):
                     session_sql.query(Profile) \
                         .filter(Profile.id == profile_result.id) \
                         .update(my_dict)
-        item.amount -= 1
-        if item.amount == 0:
-            session_sql.query(BackpackItem) \
-                .filter(BackpackItem.name == item_name) \
-                .filter(BackpackItem.hero_id == profile_result.id) \
-                .delete()
-            profile_result.capacity += 1
+                    item.amount -= 1
+                    if item.amount == 0:
+                        session_sql.query(BackpackItem) \
+                            .filter(BackpackItem.name == item_name) \
+                            .filter(BackpackItem.hero_id == profile_result.id) \
+                            .delete()
+                        profile_result.capacity += 1
+            elif statistic in other_statistics and statistic_value is not None:
+                current_profile_statistic_value = dictionary_profile[statistic]
+                item_statistic_modifier = dictionary_item_description[statistic]
+                my_dict = {statistic: current_profile_statistic_value + item_statistic_modifier}
+                session_sql.query(Profile) \
+                    .filter(Profile.id == profile_result.id) \
+                    .update(my_dict)
+                item.amount -= 1
+                if item.amount == 0:
+                    session_sql.query(BackpackItem) \
+                        .filter(BackpackItem.name == item_name) \
+                        .filter(BackpackItem.hero_id == profile_result.id) \
+                        .delete()
+                    profile_result.capacity += 1
         session_sql.commit()
         return f"Użyto {item_name.replace('_', ' ')}"
 
