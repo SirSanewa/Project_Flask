@@ -311,7 +311,7 @@ def profile():
                "chance_to_crit": profile_result.chance_to_crit,
                "chance_to_steal": profile_result.chance_to_steal,
                "capacity": profile_result.capacity,
-               "money": profile_result.money}
+               "money": round(profile_result.money, 2)}
     if profile_result.inventory:
         context["inventory"] = create_inventory_for_profile(profile_result.inventory)
     if profile_result.backpack:
@@ -416,7 +416,7 @@ def shop(text):
         else:
             if add_inventory_item(new_item_name, profile_result, user_id):
                 context["error"] = add_inventory_item(new_item_name, profile_result, user_id)
-    context["money"] = profile_result.money
+    context["money"] = round(profile_result.money, 2)
     return render_template("shop.html", **context)
 
 
@@ -460,7 +460,7 @@ def update_exp_and_lvl(exp_reward, profile, win_fight=True):
     max_exp = int(profile.level * 1.5 * 100)
     if win_fight:
         profile.exp += exp_reward
-        while profile.exp > max_exp:
+        while profile.exp >= max_exp:
             profile.exp -= max_exp
             profile.level += 1
             profile.max_hp += profile.max_hp * level_update_modifier
@@ -537,8 +537,6 @@ def search_area():
         .filter(Monster.name == monster_name) \
         .one()
     _, profile_result = define_user_id_and_sql_profile()
-    session_sql.commit()
-    # test - odbiera hp()
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
@@ -553,10 +551,10 @@ def search_area():
             your_move = use_consumable(used_item_name, profile_result)
         elif request.form.get("run"):
             money_lost = profile_result.money * money_lost_modifier
-            profile_result.money -= int(money_lost)
+            profile_result.money -= round(money_lost, 2)
             reset_monster_stats(monster)
             session_sql.commit()
-            return render_template("fight_result.html", result="run", money=int(money_lost))
+            return render_template("fight_result.html", result="run", money=round(money_lost, 2))
         if request.form:
             enemy_move = monster_attack(monster, profile_result)
         context["your_move"] = your_move
@@ -607,6 +605,7 @@ def attack(profile_result, monster):
 
 
 def spell(profile_result, monster):
+    global session_sql
     _spell_cost = 40
     _spell_dmg = 40
     if_hit_chance = 50
@@ -624,7 +623,7 @@ def spell(profile_result, monster):
 def monster_attack(monster, profile_result):
     global session_sql
     _spell_cost = 40
-    _spell_dmg = 40
+    _spell_dmg = 50
     magic_attack_chance = 20
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
