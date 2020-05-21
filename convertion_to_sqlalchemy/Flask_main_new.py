@@ -477,12 +477,12 @@ def update_exp_and_lvl(exp_reward, profile, win_fight=True):
                 profile.exp += int((profile.level-1) * 1.5 * 100)
                 profile.exp -= exp_reward
                 profile.level -= 1
-                profile.max_hp = (profile.max_hp * 100)/((level_update_modifier*100)+100)
-                profile.hp = (profile.hp * 100) / ((level_update_modifier * 100) + 100)
-                profile.max_mana = (profile.max_mana * 100)/((level_update_modifier*100)+100)
-                profile.mana = (profile.mana * 100) / ((level_update_modifier * 100) + 100)
-                profile.attack_dmg = (profile.attack_dmg * 100)/((level_update_modifier*100)+100)
-                profile.armor = (profile.armor * 100) / ((level_update_modifier * 100) + 100)
+                profile.max_hp = round((profile.max_hp * 100)/((level_update_modifier*100)+100))
+                profile.hp = round((profile.hp * 100) / ((level_update_modifier * 100) + 100))
+                profile.max_mana = round((profile.max_mana * 100)/((level_update_modifier*100)+100))
+                profile.mana = round((profile.mana * 100) / ((level_update_modifier * 100) + 100))
+                profile.attack_dmg = round((profile.attack_dmg * 100)/((level_update_modifier*100)+100))
+                profile.armor = round((profile.armor * 100) / ((level_update_modifier * 100) + 100))
             else:
                 profile.exp = 0
 
@@ -568,8 +568,6 @@ def search_area():
     global session_sql
     your_move = None
     enemy_move = None
-    hero_spell_cost = 40
-    hero_spell_dmg = 40
     money_lost_modifier = 0.1
     location = request.args["location"]
     monster_name = request.args["monster"]
@@ -577,6 +575,8 @@ def search_area():
         .filter(Monster.name == monster_name) \
         .one()
     _, profile_result = define_user_id_and_sql_profile()
+    hero_spell_cost = 40
+    hero_spell_dmg = round(40 + (40 * ((profile_result.level - 1) * 0.02)))
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
@@ -666,7 +666,7 @@ def spell(profile_result, monster, hero_spell_cost, hero_spell_dmg):
 def monster_attack(monster, profile_result):
     global session_sql
     _spell_cost = 40
-    _spell_dmg = 50
+    _spell_dmg = round(40 + (40 * ((monster.level - 1) * 0.02)))
     magic_attack_chance = 20
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
@@ -683,7 +683,7 @@ def monster_attack(monster, profile_result):
     else:
         crit_chance = int(monster.chance_to_crit * 100)
         chance_to_crit_result = randint(1, 100)
-        dmg = int(monster.attack_dmg - (profile_result.armor / 10))
+        dmg = round(monster.attack_dmg - (profile_result.armor / 10))
         if chance_to_crit_result <= crit_chance:
             new_dmg = dmg * crit_dmg_multiplier
             profile_result.hp -= new_dmg

@@ -59,7 +59,7 @@
                 <br>
                 <b>name:</b><br>{{ profile.name }}<br>
                 <b>lvl:</b> {{ profile.level }},<br>
-                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ profile.hp }}/{{ profile.max_hp }},<br>
+                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ profile.hp | round(1) }}/{{ profile.max_hp }},<br>
                 <img class="icon" src="/static/ikonki/mana.jpg" title="mana"> {{ profile.mana }}/{{ profile.max_mana }},<br>
                 <img class="icon" src="/static/ikonki/stamina.jpg" title="stamina"> {{ profile.stamina }}/{{ profile.max_stamina }},<br>
                 <img class="icon" src="/static/ikonki/armor.jpg" title="armor"> {{ profile.armor }},<br>
