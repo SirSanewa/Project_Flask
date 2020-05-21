@@ -113,10 +113,24 @@
             {% endif %}
         </div>
         <div class="button">
-            uzycie przedmiotu
+            {% if profile.backpack %}
+            <form method="post">
+                <select name="list">
+                    {% for item in profile.backpack %}
+                        <option value="{{ item.name }}">{{ item.name | replace("_", " ")}} x{{ item.amount }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <input type="submit" name="use_consumable" value="użyj">
+            </form>
+            {% else %}
+            brak przedmiotóœ do użycia
+            {% endif %}
         </div>
         <div class="button">
-            ucieczka
+            <form method="post">
+                <button name="run" value="run">ucieszka</button>
+            </form>
         </div>
     </div>
 </div>

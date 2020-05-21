@@ -318,7 +318,7 @@ def profile():
         context["backpack"] = create_backpack_for_profile(profile_result.backpack)
     if request.form.get("use_item"):
         used_item_name = request.form.get("use_item")
-        use_consumable(used_item_name, profile_result, user_id)
+        use_consumable(used_item_name, profile_result)
         return redirect("/profile")
     elif request.form.get("sell_item"):
         sold_item = request.form.get("sell_item")
@@ -345,12 +345,12 @@ def sell_consumable(item_name, profile_result, user_id):
     session_sql.commit()
 
 
-def use_consumable(item_name, profile_result, user_id):
+def use_consumable(item_name, profile_result):
     global session_sql
     changable_statistics = {"hp": "max_hp", "mana": "max_mana", "stamina": "max_stamina"}
     item = session_sql.query(BackpackItem) \
         .filter(BackpackItem.name == item_name) \
-        .filter(BackpackItem.hero_id == user_id) \
+        .filter(BackpackItem.hero_id == profile_result.id) \
         .one()
     dictionary_item_description = object_as_dict(item.item_data)
     dictionary_profile = object_as_dict(profile_result)
@@ -370,13 +370,15 @@ def use_consumable(item_name, profile_result, user_id):
                     if item.amount == 0:
                         session_sql.query(BackpackItem) \
                             .filter(BackpackItem.name == item_name) \
-                            .filter(BackpackItem.hero_id == user_id) \
+                            .filter(BackpackItem.hero_id == profile_result.id) \
                             .delete()
                         profile_result.capacity += 1
+                    print(my_dict)
                     session_sql.query(Profile) \
-                        .filter(Profile.id == user_id) \
+                        .filter(Profile.id == profile_result.id) \
                         .update(my_dict)
                     session_sql.commit()
+                    return f"Użyto {item_name.replace('_', ' ')}"
 
 
 @app.route("/shop/<text>", methods=["get", "post"])
@@ -453,16 +455,30 @@ def quest_details_buy_shield(profile):
     return quest_details
 
 
-def update_exp_and_lvl(exp_reward, profile):
+def update_exp_and_lvl(exp_reward, profile, win_fight=True):
     level_update_modifier = 0.05
-    profile.exp += exp_reward
     max_exp = int(profile.level * 1.5 * 100)
-    while profile.exp > max_exp:
-        profile.exp -= max_exp
-        profile.level += 1
-        profile.max_hp += profile.max_hp * level_update_modifier
-        profile.max_mana += profile.max_mana * level_update_modifier
-        profile.attack_dmg += profile.attack_dmg * level_update_modifier
+    if win_fight:
+        profile.exp += exp_reward
+        while profile.exp > max_exp:
+            profile.exp -= max_exp
+            profile.level += 1
+            profile.max_hp += profile.max_hp * level_update_modifier
+            profile.max_mana += profile.max_mana * level_update_modifier
+            profile.attack_dmg += profile.attack_dmg * level_update_modifier
+    if not win_fight:
+        if profile.exp - exp_reward >= 0:
+            profile.exp -= exp_reward
+        else:
+            if profile.level > 1:
+                profile.exp += int((profile.level-1) * 1.5 * 100)
+                profile.exp -= exp_reward
+                profile.level -= 1
+                profile.max_hp = (profile.max_hp * 100)/((level_update_modifier*100)+100)
+                profile.max_mana = (profile.max_mana * 100)/((level_update_modifier*100)+100)
+                profile.attack_dmg = (profile.attack_dmg * 100)/((level_update_modifier*100)+100)
+            else:
+                profile.exp = 0
 
 
 def quest_details_buy_simple_axe(profile):
@@ -512,6 +528,7 @@ def searching(location):
 @login_required
 def search_area():
     global session_sql
+    money_lost_modifier = 0.1
     location = request.args["location"]
     monster_name = request.args["monster"]
     monster = session_sql.query(Monster) \
@@ -535,10 +552,23 @@ def search_area():
             enemy_move = monster_attack(monster, profile_result)
             context["your_move"] = your_move
             context["enemy_move"] = enemy_move
+        elif request.form.get("list"):
+            used_item_name = request.form.get("list")
+            your_move = use_consumable(used_item_name, profile_result)
+            enemy_move = monster_attack(monster, profile_result)
+            context["your_move"] = your_move
+            context["enemy_move"] = enemy_move
+        elif request.form.get("run"):
+            money_lost = profile_result.money * money_lost_modifier
+            profile_result.money -= money_lost
+            reset_monster_stats(monster)
+            session_sql.commit()
+            return render_template("fight_result.html", result="run", money=money_lost)
         # sprawdzenie kto wygrał
         if profile_result.hp < 0:
             reset_monster_stats(monster)
             profile_result.hp = 1
+            update_exp_and_lvl(monster.exp_reward, profile_result, win_fight=False)
             session_sql.commit()
             return render_template("fight_result.html", result="lost")
         elif monster.hp < 0:

@@ -47,9 +47,16 @@
         <p class="reward">Otrzymujesz {{ money_reward }}$ i {{ exp_reward }}exp.</p>
         <a class="link" href="/profile">Powrót do profilu</a>
     </div>
-    {% else %}
+    {% elif result == 'lost' %}
     <div class="result" style="background-color: RGBA(252, 0, 0, 0.7)">
         <p class="text">Porażka ...</p><br>
+        <p class="reward">Straciłeś: {{ exp_lost }}</p>
+        <a class="link" href="/profile">Powrót do profilu</a>
+    </div>
+    {% else %}
+    <div class="result" style="background-color: RGBA(227, 151, 45, 0.7)">
+        <p class="text">Uciekłeś z pola bitwy</p><br>
+        <p class="reward">Podczas ucieczki zguibłeś: {{ money }}$</p>
         <a class="link" href="/profile">Powrót do profilu</a>
     </div>
     {% endif %}
