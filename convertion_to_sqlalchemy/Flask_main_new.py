@@ -1,11 +1,9 @@
 from datetime import datetime
 from random import choice, randint
-from time import sleep
-
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, BackpackItem, \
-    Quests, Monster
+from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, \
+    BackpackItem, Quests, Monster
 from session import session_creator
 import base64
 from sqlalchemy import asc, inspect
@@ -13,6 +11,7 @@ import logging
 from key import secret_key
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.secret_key = secret_key
@@ -667,11 +666,11 @@ def monster_attack(monster, profile_result):
     global session_sql
     _spell_cost = 40
     _spell_dmg = round(40 + (40 * ((monster.level - 1) * 0.02)))
-    magic_attack_chance = 20
+    magic_attack_chance = 40
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
     if result <= magic_attack_chance and monster.mana > _spell_cost:
-        if_hit_chance = 60
+        if_hit_chance = 80
         if_hit_result = randint(1, 100)
         monster.mana -= _spell_cost
         if if_hit_result <= if_hit_chance:
