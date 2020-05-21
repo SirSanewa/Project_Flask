@@ -464,8 +464,11 @@ def update_exp_and_lvl(exp_reward, profile, win_fight=True):
             profile.exp -= max_exp
             profile.level += 1
             profile.max_hp += profile.max_hp * level_update_modifier
+            profile.hp += profile.hp * level_update_modifier
             profile.max_mana += profile.max_mana * level_update_modifier
+            profile.mana += profile.mana * level_update_modifier
             profile.attack_dmg += profile.attack_dmg * level_update_modifier
+            profile.armor += profile.armor * level_update_modifier
     if not win_fight:
         if profile.exp - exp_reward >= 0:
             profile.exp -= exp_reward
@@ -475,8 +478,11 @@ def update_exp_and_lvl(exp_reward, profile, win_fight=True):
                 profile.exp -= exp_reward
                 profile.level -= 1
                 profile.max_hp = (profile.max_hp * 100)/((level_update_modifier*100)+100)
+                profile.hp = (profile.hp * 100) / ((level_update_modifier * 100) + 100)
                 profile.max_mana = (profile.max_mana * 100)/((level_update_modifier*100)+100)
+                profile.mana = (profile.mana * 100) / ((level_update_modifier * 100) + 100)
                 profile.attack_dmg = (profile.attack_dmg * 100)/((level_update_modifier*100)+100)
+                profile.armor = (profile.armor * 100) / ((level_update_modifier * 100) + 100)
             else:
                 profile.exp = 0
 
@@ -516,12 +522,44 @@ def journey():
 @login_required
 def searching(location):
     global session_sql
+    _, profile_result = define_user_id_and_sql_profile()
     monster_list = {"forest": ["Warewolf", "Goblin"],
                     "sea": None,
                     "dessert": None,
                     "graveyard": None}
     monster_choosen = choice(monster_list[location])
+    monster = session_sql.query(Monster)\
+        .filter(Monster.name == monster_choosen)\
+        .one()
+    update_monster_level(monster, profile_result, set_default=False)
     return redirect(url_for("search_area", location=location, monster=monster_choosen))
+
+
+def update_monster_level(monster, profile_result, set_default=False):
+    global session_sql
+    level_update_modifier =0.05
+    if not set_default:
+        new_monster_level = randint(1, profile_result.id + 2)
+        if new_monster_level >= 2:
+            monster.level = new_monster_level
+            for _ in range(1, new_monster_level):
+                monster.hp += monster.hp * level_update_modifier
+                monster.max_hp += monster.max_hp * level_update_modifier
+                monster.mana += monster.mana * level_update_modifier
+                monster.max_mana += monster.max_mana * level_update_modifier
+                monster.attack_dmg += monster.attack_dmg * level_update_modifier
+                monster.armor += monster.armor * level_update_modifier
+    if set_default:
+        if monster.level >= 2:
+            for _ in range(1, monster.level):
+                monster.level -= 1
+                monster.max_hp = (monster.max_hp * 100)/((level_update_modifier*100)+100)
+                monster.hp = (monster.hp * 100) / ((level_update_modifier * 100) + 100)
+                monster.max_mana = (monster.max_mana * 100) / ((level_update_modifier * 100) + 100)
+                monster.mana = (monster.mana * 100) / ((level_update_modifier * 100) + 100)
+                monster.attack_dmg = (monster.attack_dmg * 100) / ((level_update_modifier * 100) + 100)
+                monster.armor = (monster.armor * 100) / ((level_update_modifier * 100) + 100)
+    session_sql.commit()
 
 
 @app.route("/search_area/", methods=["get", "post"])
@@ -530,6 +568,8 @@ def search_area():
     global session_sql
     your_move = None
     enemy_move = None
+    hero_spell_cost = 40
+    hero_spell_dmg = 40
     money_lost_modifier = 0.1
     location = request.args["location"]
     monster_name = request.args["monster"]
@@ -540,18 +580,21 @@ def search_area():
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
-               "profile": profile_result}
+               "profile": profile_result,
+               "spell_cost": hero_spell_cost,
+               "spell_dmg": hero_spell_dmg}
     if profile_result.hp > 0 and monster.hp > 0:
         if request.form.get("attack"):
             your_move = attack(profile_result, monster)
         elif request.form.get("spell"):
-            your_move = spell(profile_result, monster)
+            your_move = spell(profile_result, monster, hero_spell_cost, hero_spell_dmg)
         elif request.form.get("list"):
             used_item_name = request.form.get("list")
             your_move = use_consumable(used_item_name, profile_result)
         elif request.form.get("run"):
             money_lost = profile_result.money * money_lost_modifier
             profile_result.money -= round(money_lost, 2)
+            update_monster_level(monster, profile_result, set_default=True)
             reset_monster_stats(monster)
             session_sql.commit()
             return render_template("fight_result.html", result="run", money=round(money_lost, 2))
@@ -560,6 +603,7 @@ def search_area():
         context["your_move"] = your_move
         context["enemy_move"] = enemy_move
         if profile_result.hp < 0:
+            update_monster_level(monster, profile_result, set_default=True)
             reset_monster_stats(monster)
             profile_result.hp = 1
             update_exp_and_lvl(monster.exp_reward, profile_result, win_fight=False)
@@ -568,6 +612,7 @@ def search_area():
         elif monster.hp < 0:
             profile_result.money += monster.money_reward
             update_exp_and_lvl(monster.exp_reward, profile_result)
+            update_monster_level(monster, profile_result, set_default=True)
             reset_monster_stats(monster)
             session_sql.commit()
             return render_template("fight_result.html",
@@ -604,18 +649,16 @@ def attack(profile_result, monster):
             return f"Zadałeś {dmg} obrażeń przeciwnikowi"
 
 
-def spell(profile_result, monster):
+def spell(profile_result, monster, hero_spell_cost, hero_spell_dmg):
     global session_sql
-    _spell_cost = 40
-    _spell_dmg = 40
     if_hit_chance = 50
     if_hit_result = randint(1, 100)
-    if profile_result.mana >= _spell_cost:
-        profile_result.mana -= _spell_cost
+    if profile_result.mana >= hero_spell_cost:
+        profile_result.mana -= hero_spell_cost
         if if_hit_result <= if_hit_chance:
-            monster.hp -= _spell_dmg
+            monster.hp -= hero_spell_dmg
             session_sql.commit()
-            return f"Wykonałeś atak magiczny i zadałeś {_spell_dmg} dmg obrażeń"
+            return f"Wykonałeś atak magiczny i zadałeś {hero_spell_dmg} dmg obrażeń"
         else:
             return f"Chybiłeś atak magiczny"
 
@@ -660,8 +703,4 @@ def monster_attack(monster, profile_result):
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: ucieczka i użycei miksturki
 # TODO: szpital(leczenie kosztuje energie?)
-# TODO: lvl przeciwnika(modyfikowanie statystyk)
-# TODO: walka
-# TODO: questy tygodnidowe

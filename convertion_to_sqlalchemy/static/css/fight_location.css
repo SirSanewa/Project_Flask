@@ -83,3 +83,16 @@ p.fight_info {
     color: RGBA(102, 10, 16, 1);
     margin-top: 2px;
 }
+p.attack_name {
+    margin-top: 5px;
+    color: blue;
+}
+p.spell_description {
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: 0px;
+}
+p.error {
+    margin-top: 0px;
+    color: red;
+}

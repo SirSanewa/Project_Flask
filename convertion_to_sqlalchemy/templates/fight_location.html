@@ -78,13 +78,13 @@
                 <br>
                 <b>name:</b><br>{{ monster.name }}<br>
                 <b>lvl:</b> {{ monster.level }},<br>
-                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ monster.hp }}/{{ monster.max_hp }},<br>
-                <img class="icon" src="/static/ikonki/mana.jpg" title="mana"> {{ monster.mana }}/{{ monster.max_mana }},<br>
+                <img class="icon" src="/static/ikonki/hp.jpg" title="hp"> {{ monster.hp | round(1) }}/{{ monster.max_hp | round(1)}},<br>
+                <img class="icon" src="/static/ikonki/mana.jpg" title="mana"> {{ monster.mana | round(1) }}/{{ monster.max_mana | round(1) }},<br>
                 <img class="icon" src="/static/ikonki/stamina.jpg" title="stamina">
                 {{ monster.stamina }}/{{ monster.max_stamina }},<br>
-                <img class="icon" src="/static/ikonki/armor.jpg" title="armor"> {{ monster.armor }},<br>
-                <img class="icon" src="/static/ikonki/dmg.jpg" title="DMG"> {{ monster.attack_dmg }},<br>
-                <img class="icon" src="/static/ikonki/crit.jpg" title="chance for crit"> {{ monster.chance_to_crit }}
+                <img class="icon" src="/static/ikonki/armor.jpg" title="armor"> {{ monster.armor | round(1) }},<br>
+                <img class="icon" src="/static/ikonki/dmg.jpg" title="DMG"> {{ monster.attack_dmg | round(1) }},<br>
+                <img class="icon" src="/static/ikonki/crit.jpg" title="chance for crit"> {{ monster.chance_to_crit | round(2) }}
             </div>
         </div>
         <div class="text">
@@ -99,20 +99,23 @@
     <hr>
     <div class="options">
         <div class="button">
+            <p class="attack_name" style="margin-bottom: 20px;">Atak Wręcz</p>
             <form method="post">
-                <button name="attack" value="attack">atak wręcz</button>
+                <button name="attack" value="attack">Atakuj</button>
             </form>
         </div>
         <div class="button">
+            <p class="attack_name">Magiczny Pocisk</p><p class="spell_description">koszt many: {{ spell_cost }}<br>obrażenia: {{ spell_dmg }}</p>
             {% if profile.mana >= 40 %}
             <form method="post">
-                <button name="spell" value="spell">użycie czaru</button>
+                <button name="spell" value="spell">Rzuć czar</button>
             </form>
             {% else %}
-                brak many na czar
+                <p class="error">Brak many na czar</p>
             {% endif %}
         </div>
         <div class="button">
+            <p class="attack_name" style="margin-bottom: 10px;">Użyj Przedmiotu</p>
             {% if profile.backpack %}
             <form method="post">
                 <select name="list">
@@ -121,15 +124,16 @@
                     {% endfor %}
                 </select>
                 <br>
-                <input type="submit" name="use_consumable" value="użyj">
+                <input style="margin-top: 5px;" type="submit" name="use_consumable" value="Użyj">
             </form>
             {% else %}
-            brak przedmiotów do użycia
+            <p class="error">Brak przedmiotów do użycia</p>
             {% endif %}
         </div>
         <div class="button">
+            <p class="attack_name" style="margin-bottom: 20px;">Ucieczka</p>
             <form method="post">
-                <button name="run" value="run">ucieszka</button>
+                <button name="run" value="run">Uciekaj</button>
             </form>
         </div>
     </div>
