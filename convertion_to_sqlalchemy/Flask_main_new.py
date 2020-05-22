@@ -591,7 +591,7 @@ def search_area():
         .one()
     _, profile_result = define_user_id_and_sql_profile()
     hero_spell_cost = 40
-    hero_spell_dmg = round(40 + (40 * ((profile_result.level - 1) * 0.02)))
+    hero_spell_dmg = round(40 + (40 * ((profile_result.level - 1) * 0.04)))
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
@@ -681,7 +681,7 @@ def spell(profile_result, monster, hero_spell_cost, hero_spell_dmg):
 def monster_attack(monster, profile_result):
     global session_sql
     _spell_cost = 40
-    _spell_dmg = round(40 + (40 * ((monster.level - 1) * 0.02)))
+    _spell_dmg = round(40 + (40 * ((monster.level - 1) * 0.04)))
     magic_attack_chance = 40
     crit_dmg_multiplier = 2.5
     result = randint(1, 100)
