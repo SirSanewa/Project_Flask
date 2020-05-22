@@ -1,5 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice, randint
+from time import strptime
+
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
 from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, \
@@ -711,6 +713,27 @@ def monster_attack(monster, profile_result):
                 profile_result.hp -= dmg
                 session_sql.commit()
                 return f"{monster.name} zaatakował i zadał {dmg} obrażeń"
+
+
+@app.route("/druid", methods=["POST", "GET"])
+@login_required
+def druid():
+    global session_sql
+    _, profile_result = define_user_id_and_sql_profile()
+    time_delay_modifier = profile_result.level * 1
+    context = {"time": time_delay_modifier}
+    if request.form.get("start"):
+        date_now = datetime.now()
+        time_to_heal = timedelta(0, 0, 0, 0, time_delay_modifier)
+        end_time = date_now + time_to_heal
+        while True:
+            date_now = datetime.now()
+            if date_now >= end_time:
+                profile_result.hp = profile_result.max_hp
+                profile_result.mana = profile_result.max_mana
+                session_sql.commit()
+                return redirect("/profile")
+    return render_template("hospital.html", **context)
 
 
 if __name__ == "__main__":

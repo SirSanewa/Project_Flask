@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Game - Hospital</title>
+    <style>
+    html body {
+        background: url("/static/druid.png") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        margin: 0;
+        height: 100%
+        margin-left: 100px;
+        text-align: center;
+    }
+    div.result {
+        padding: 10px;
+        padding-top: 20px;
+        border-radius: 25px;
+        border: 1px solid black;
+        height: 200px;
+        width: 50%;
+        margin-top: 5%;
+        margin-left: 25%;
+        background-color: RGBA(156, 152, 142, 0.6);
+    }
+    a.link:link, a.link:visited {
+        color: white;
+        text-decoration: none;
+    }
+    a.link:hover, a.link:active {
+        boarder-left: solid black 1px;
+        color: black;
+        text-decoration: none;
+    }
+    p.title {
+        color: RGBA(255, 255, 255, 1);
+        font-size: 32px;
+        margin-top: 10%;
+        margin-bottom: 0px;
+    }
+    button {
+        margin-top: -10px;
+        margin-bottom: 10px;
+    }
+    </style>
+</head>
+<body>
+    <p class="title">Druid Ciebie wita Wędrowcze</p>
+    <div class="result">
+        Druid uleczy Twoje obrażenia za darmo. Jedyne czego oczekuje w zamian to wysłuchanie Twoich wojennych opowieści.
+        Z szacunku dla tego mędrca nie będziesz mógł wykonywać innych czynności w trakcie rozmowy.
+        Biorąc pod uwagę Twoje doświadczenie w boju, opowiedzenie całej historii zajmię: {{ time }} minut/y.
+        <br><br><br><br>
+        <form method="post">
+            <button name="start" value="start">
+                Opowiedz o przygodach
+            </button>
+        </form>
+        <a class="link" href="/profile" title="powrót do profilu">Nie, dziękuje</a>
+    </div>
+</body>
+</html>
