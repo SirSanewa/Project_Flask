@@ -738,5 +738,3 @@ def druid():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-# TODO: szpital(leczenie kosztuje energie?)
