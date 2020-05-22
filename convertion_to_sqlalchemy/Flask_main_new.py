@@ -539,9 +539,9 @@ def searching(location):
     global session_sql
     _, profile_result = define_user_id_and_sql_profile()
     monster_list = {"forest": ["Warewolf", "Goblin", "Ent", "Centaur"],
-                    "sea": None,
-                    "dessert": None,
-                    "graveyard": None}
+                    "sea": ["Pirate", "Shark", "Sirena", "Kraken"],
+                    "desert": ["Scorpion", "Golem", "Wizard", "Worm"],
+                    "graveyard": ["Skeleton", "Death", "Horseman", "Vampire"]}
     monster_choosen = choice(monster_list[location])
     monster = session_sql.query(Monster)\
         .filter(Monster.name == monster_choosen)\
@@ -552,9 +552,9 @@ def searching(location):
 
 def update_monster_level(monster, profile_result, set_default=False):
     global session_sql
-    level_update_modifier =0.05
+    level_update_modifier = 0.05
     if not set_default:
-        new_monster_level = randint(1, profile_result.id + 2)
+        new_monster_level = randint(1, 4)
         if new_monster_level >= 2:
             monster.level = new_monster_level
             for _ in range(1, new_monster_level):

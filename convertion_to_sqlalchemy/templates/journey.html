@@ -27,7 +27,7 @@
         </div>
         <div class="option">
             {% if level >= 5 %}
-                <form action="/search_area/sea" method="post">
+                <form action="/searching/sea" method="post">
                     <button name="sea" value="sea">Rozpocznij podróż</button>
                 </form>
             {% else %}
@@ -41,8 +41,8 @@
         </div>
         <div class="option">
             {% if level >= 10 %}
-                <form action="/search_area/dessert" method="post">
-                    <button name="dessert" value="dessert">Rozpocznij podróż</button>
+                <form action="/searching/desert" method="post">
+                    <button name="desert" value="desert">Rozpocznij podróż</button>
                 </form>
             {% else %}
                 <p>Potrzebujesz poziomu 10 żeby wyruszyć w to miejsce</p>
@@ -55,7 +55,7 @@
         </div>
         <div class="option">
             {% if level >= 20 %}
-                <form action="/search_area/graveyard" method="post">
+                <form action="/searching/graveyard" method="post">
                     <button name="graveyard" value="graveyard">Rozpocznij podróż</button>
                 </form>
             {% else %}
