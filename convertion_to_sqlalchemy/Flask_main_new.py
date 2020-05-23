@@ -568,12 +568,12 @@ def update_monster_level(monster, profile_result, set_default=False):
         if monster.level >= 2:
             for _ in range(1, monster.level):
                 monster.level -= 1
-                monster.max_hp = (monster.max_hp * 100)/((level_update_modifier*100)+100)
-                monster.hp = (monster.hp * 100) / ((level_update_modifier * 100) + 100)
-                monster.max_mana = (monster.max_mana * 100) / ((level_update_modifier * 100) + 100)
-                monster.mana = (monster.mana * 100) / ((level_update_modifier * 100) + 100)
-                monster.attack_dmg = (monster.attack_dmg * 100) / ((level_update_modifier * 100) + 100)
-                monster.armor = (monster.armor * 100) / ((level_update_modifier * 100) + 100)
+                monster.max_hp = int((monster.max_hp * 100)/((level_update_modifier*100)+100))
+                monster.hp = int((monster.hp * 100) / ((level_update_modifier * 100) + 100))
+                monster.max_mana = int((monster.max_mana * 100) / ((level_update_modifier * 100) + 100))
+                monster.mana = int((monster.mana * 100) / ((level_update_modifier * 100) + 100))
+                monster.attack_dmg = int((monster.attack_dmg * 100) / ((level_update_modifier * 100) + 100))
+                monster.armor = int((monster.armor * 100) / ((level_update_modifier * 100) + 100))
     session_sql.commit()
 
 
