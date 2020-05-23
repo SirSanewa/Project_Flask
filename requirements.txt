@@ -2,10 +2,8 @@ appdirs==1.4.3
 asgiref==3.2.3
 Click==7.0
 distlib==0.3.0
-Django==3.0.2
 filelock==3.0.12
 Flask==1.1.1
-flask-googlemaps==0.4.0
 itsdangerous==1.1.0
 Jinja2==2.11.1
 MarkupSafe==1.1.1

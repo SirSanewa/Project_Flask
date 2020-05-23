@@ -26,12 +26,12 @@ hr {
     color: #12100e;
     }
 div.stat{
-    width: 30%;
+    width: 35%;
     height: 100%;
     }
 div.image{
     height: 100%;
-    width: 70%;
+    width: 65%;
     }
 div.enemy {
     padding: 0px;
@@ -73,8 +73,8 @@ img.icon {
 img.photo {
     border-radius: 20px;
     margin: 1% 1% 1% 1%;
-    height: 97%;
-    width: 97.2%
+    height: 97.5%;
+    width: 97.5%
 }
 p.info {
     margin-top: 1.5%;

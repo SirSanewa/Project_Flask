@@ -580,6 +580,7 @@ def update_monster_level(monster, profile_result, set_default=False):
 @app.route("/search_area/", methods=["get", "post"])
 @login_required
 def search_area():
+    dmg_level_modifier = 0.04
     global session_sql
     your_move = None
     enemy_move = None
@@ -591,7 +592,7 @@ def search_area():
         .one()
     _, profile_result = define_user_id_and_sql_profile()
     hero_spell_cost = 40
-    hero_spell_dmg = round(40 + (40 * ((profile_result.level - 1) * 0.04)))
+    hero_spell_dmg = round(40 + (40 * ((profile_result.level - 1) * dmg_level_modifier)))
     context = {"location": location,
                "monster": monster,
                "monster_image": base64.b64encode(monster.image).decode("utf-8"),
