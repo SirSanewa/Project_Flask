@@ -1,4 +1,4 @@
-from models_backpack_inventory_profile import AllItemsInventory, AllItemsBackpack, Monster
+from db_init import AllItemsInventory, AllItemsBackpack, Monster
 import os
 from session import session_creator
 

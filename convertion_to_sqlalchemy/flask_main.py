@@ -4,7 +4,7 @@ from time import strptime
 
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
-from models_backpack_inventory_profile import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, \
+from db_init import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, \
     BackpackItem, Quests, Monster
 from session import session_creator
 import base64
@@ -735,6 +735,8 @@ def druid():
                 session_sql.commit()
                 return redirect("/profile")
     return render_template("hospital.html", **context)
+# status leczony w profilu(czas ukończenia leczenia)
+# funkcja get_status,
 
 
 if __name__ == "__main__":

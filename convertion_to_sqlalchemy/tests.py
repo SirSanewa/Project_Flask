@@ -1,5 +1,5 @@
 import unittest
-from Flask_main_new import create_modifier
+from flask_main import create_modifier
 
 
 class AllTest(unittest.TestCase):

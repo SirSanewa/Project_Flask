@@ -21,6 +21,9 @@ To run Project "The Game" You will need:
 
 All requirements available in **requirements.txt**
 
+## Project run
+To run the program you create database(by running db_init.py), fill it with data(by running populate_with_data.py) and run the app(with flask_main.py)
+
 ## Project author info
 Łukasz Sanewski email: sanewski@o2.pl
  
