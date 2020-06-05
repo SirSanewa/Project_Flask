@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
 from random import choice, randint
-from time import strptime
-
 from flask import Flask, request, render_template, redirect, session, url_for
 from sqlalchemy.orm.exc import NoResultFound
 from db_init import AllItemsBackpack, AllItemsInventory, Profile, InventoryItem, \
